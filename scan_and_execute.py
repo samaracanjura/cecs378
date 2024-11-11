@@ -62,4 +62,6 @@ def main():
     if ready_to_attack:
         pass
 
+    input("Press Enter to exit...")
+
 main()
