@@ -2,7 +2,7 @@ import os
 import subprocess #use to run steghide
 from cryptography.fernet import Fernet
 
-def extract_message(image_path: str, password: str):
+def extract_message(image_path: str, password):
     """Executes commandlines on powershell to run steghide and obtain in order
     to obtain the "secret" message embedded within a given image.
 
@@ -12,10 +12,17 @@ def extract_message(image_path: str, password: str):
         in the image
     :return: A string representing the secret text from the image
     """
-    pass
+    result = subprocess.run(["steghide","extract", "-sf", image_path], input = password, text = True, capture_output = True)
+
+    print(result.stdout)
+
+    
+    #pass
 
 def main():
-    bool: readyToAttack = False  # Identifies if upon execution, the computer being run from is a victim
+    
+    extract_message("download.jpg", "Mochi")
+    """bool: readyToAttack = False  # Identifies if upon execution, the computer being run from is a victim
 
     # Represents the two images to be scanned for in the downloads directory
     imageContainingKey = "image1.png"
@@ -62,6 +69,6 @@ def main():
     if ready_to_attack:
         pass
 
-    input("Press Enter to exit...")
+    input("Press Enter to exit...")"""
 
 main()
