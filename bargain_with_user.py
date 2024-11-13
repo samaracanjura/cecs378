@@ -1,11 +1,10 @@
 from tkinter import *
 from PIL import Image, ImageTk
 
-
 # List of question-answer pairs to be prompted to a user
-qAndA = ({"What kind of cyber attack is this?": ("ransomware", )},
-         {"When was the first recorded case of a ransomware attack?": 1989},
-         {"How much was the largest ransomware payment ever made (in millions)?": ("75", "$75")})
+q_and_a = ({"What kind of cyber attack is this?": ("ransomware",)},
+           {"When was the first recorded case of a ransomware attack?": 1989},
+           {"How much was the largest ransomware payment ever made (in millions)?": ("75", "$75")})
 
 # Sets up window containing an image
 window = Tk()
@@ -20,11 +19,14 @@ window.geometry("572x550")
 icon_image = ImageTk.PhotoImage(file="icon.png")
 window.iconphoto(False, icon_image)
 
-def clickingSubmit():
-    """The command to be run when the user clicks the Submit button on the GUI. Each time it is clicked,
+
+def clicking_submit():
+    """
+    The command to be run when the user clicks the Submit button on the GUI. Each time it is clicked,
     it compares the user's input with the valid answers for each question and reduces the number of attempts
     left. Drives the program to either (1) decrypt a users files if they answer all the questions correctly
-    or (2) close out and not do anything if a user exhausts their attempts."""
+    or (2) close out and not do anything if a user exhausts their attempts.
+    """
     num_correct: int = 0
 
     # Iterates through each response entry and checks if it aligns with the expected answer
@@ -50,7 +52,7 @@ def clickingSubmit():
             num_correct += 1
             # Updates the flag to tell the program that the user has met the requirements to have their
             # files decrypted
-            if num_correct == len(qAndA):
+            if num_correct == len(q_and_a):
                 print("You win! Decrypting your files now...")
                 # Closes out the window and decrypts the user's files
                 window.destroy()
@@ -68,8 +70,12 @@ def clickingSubmit():
 
     # Exits out of program when user exhausts their attempts
     if attempts_left == 0:
+        # We import the decrypt.py module to perform
+        import decrypt
+
         print("You ran out of attempts! Good luck decrypting your files!")
         window.destroy()
+        decrypt.main()
 
 
 # Initializes the number of user attempts to be 3
@@ -83,8 +89,8 @@ attempt_label.pack(pady=2)
 response_entries = []
 answers = []
 
-# Iterates through each individual question-answer pair in qAndA
-for question_answer_pair in qAndA:
+# Iterates through each individual question-answer pair in q_and_a
+for question_answer_pair in q_and_a:
     # Unpacks the key-value pair from question_answer_pair as the question and answer respectively
     for question, answer in question_answer_pair.items():
         # Displays a question from the dictionary variable "question_answer_pair"
@@ -100,7 +106,7 @@ for question_answer_pair in qAndA:
         response_entries.append(response_entry)
 
 # Creates a button for the user to interact with in the GUI
-submit_button = Button(window, text="Submit", command=clickingSubmit)
+submit_button = Button(window, text="Submit", command=clicking_submit)
 submit_button.pack()
 
 # Used to keep window open and reactive to any events (i.e. clicking the submit button)
