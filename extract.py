@@ -11,9 +11,17 @@ def extract_message(image_path: str, password: str) -> str:
         in the image.
     :return: A string representing the secret text from the image
     """
-    result = subprocess.run(["steghide", "extract", "-sf", image_path], input=password,
+    if image_path == "download.jpg":
+        extracted_data_file_name = "key.txt"
+    else:
+        extracted_data_file_name = "code.txt"
+
+    result = subprocess.run(["steghide", "extract", "-sf", image_path, "-xf", extracted_data_file_name], input=password,
                             text=True, capture_output=True)
+    with open(extracted_data_file_name, "r") as file:
+        contents = file.read()
     print("Extraction Successful with: " + result.stdout)
 
+
     # Returns the code/key in a string format
-    return result.stdout
+    return contents
