@@ -78,7 +78,3 @@ def extract_message(cover_file_path: str, passphrase: str):
 
     # Returns the embedded code in a string format
     return contents
-
-
-extract_message("White_shark.jpg", "Mochi")
-# extract_message("Greenland_Shark.bmp", "Mochi")
