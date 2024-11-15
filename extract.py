@@ -1,5 +1,5 @@
 import subprocess
-import os
+#import os
 
 
 def extract_message(cover_file_path: str, passphrase: str):
