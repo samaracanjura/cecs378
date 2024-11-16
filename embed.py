@@ -15,8 +15,8 @@ def embed_file(file_to_embed: str, cover_file: str, passphrase: str):
     steghide_compatible_files: list[str] = ["jpeg", "jpg", "bmp", "wav", "au"]
     steghide_path = 'steghide-0.5.1-win32\steghide\steghide.exe'
 
-    if not os.path.exists(steghide_path):
-        raise FileNotFoundError("You need to have the Steghide folder in the same directory as your .PY/.EXE files.")
+   # if not os.path.exists(steghide_path):
+        #raise FileNotFoundError("You need to have the Steghide folder in the same directory as your .PY/.EXE files.")
 
     # Checks the compatibility of the file type with Steghide
     _, cover_file_type = cover_file.split(".")
