@@ -14,7 +14,7 @@ def embed_file(file_to_embed: str, cover_file: str, passphrase: str):
         in the image.
     """
     steghide_compatible_files: list[str] = ["jpeg", "jpg", "bmp", "wav", "au"]
-    steghide_path = '"steghide-0.5.1-win32\steghide\steghide.exe"'
+    steghide_path = 'steghide-0.5.1-win32\steghide\steghide.exe'
 
     if not os.path.exists(steghide_path):
         raise FileNotFoundError("You need to have the Steghide folder in the same directory as your .PY/.EXE files.")
@@ -33,7 +33,7 @@ def embed_file(file_to_embed: str, cover_file: str, passphrase: str):
                                  f"specified just doesn't exist.")
 
     # Represents the commandline argument to be run in Command Prompt in order to extract the embedded message
-    command = f'{steghide_path} embed -cf "{cover_file}" -ef "{file_to_embed}" -p {passphrase}\n'
+    command = f'"{steghide_path}" embed -cf "{cover_file}" -ef "{file_to_embed}" -p {passphrase}\n'
     try:
         # Runs Command Prompt in the background from within the venv
         process = subprocess.Popen("cmd.exe",
@@ -49,8 +49,10 @@ def embed_file(file_to_embed: str, cover_file: str, passphrase: str):
         # Prints out what's occurring within the command prompt itself
         output, errors = process.communicate()
         print(f"\nCommand Prompt Output when embedding {file_to_embed} into {cover_file}: "
-              f"\toutput: {output}\n"
-              f"\tErrors: {errors}\n")
+              f"\tOutput: {output}\n")
+        if errors:
+            print(f"\tErrors: {errors}\n")
+
     except Exception as e:
         print(f"An unexpected error has occurred: {e}")
 
