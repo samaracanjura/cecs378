@@ -1,10 +1,10 @@
 #import os
-from cryptography.fernet import Fernet
-from concurrent.futures import ThreadPoolExecutor
-from extract import extract_message
+#from cryptography.fernet import Fernet
+#from concurrent.futures import ThreadPoolExecutor
+#from extract import extract_message
 
 
-def decrypt_file(filename: str, f_key: Fernet):
+'''def decrypt_file(filename: str, f_key: Fernet):
     """
     Deciphers a single file provided the path of the file and the Fernet key to decrypt it.
     :param filename: Represents the file to undergo encryption
@@ -18,10 +18,10 @@ def decrypt_file(filename: str, f_key: Fernet):
     plaintext = f_key.decrypt(ciphertext)
     # Overwrites the encrypted file to be unencrypted once more
     with open(filename, "wb") as unencrypted_file:
-        unencrypted_file.write(plaintext)
+        unencrypted_file.write(plaintext)'''
 
 
-def process_directory(directory: str, f_key: Fernet):
+'''def process_directory(directory: str, f_key: Fernet):
     """
     This function processes each directory, decrypting all the files in each directory. In turn will decrypt
     the .exe files to prevent potential opening and viewing of the source code in the future
@@ -37,7 +37,7 @@ def process_directory(directory: str, f_key: Fernet):
             file_path = os.path.join(root, file)
             # Decrypts the file given the newly generated filepath
             decrypt_file(file_path, f_key)
-            print(file)
+            print(file)'''
 
 
 def main():
@@ -63,6 +63,10 @@ def main():
         # Ensures each thread completes by calling `.result()` on each future
         for future in futures:
             future.result()
+
+    # Encrypts and removes the key from directory
+    decrypt_file("key.txt", fernet_key)
+    os.remove("key.txt")
 
     print("Decryption successful!")
 
