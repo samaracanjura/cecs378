@@ -2,7 +2,7 @@ import subprocess
 import os
 
 
-def extract_file(cover_file_path: str, passphrase: str):
+def extract_message(cover_file_path: str, passphrase: str):
     """
     Executes commandlines to run Steghide and obtain in order
     to obtain the "secret" message embedded within a given image.
@@ -16,7 +16,7 @@ def extract_file(cover_file_path: str, passphrase: str):
     executable_files: list[str] = ["decrypt.exe", "decrypt.py", "encryp.exe", "encrypt.py"]
 
     # TODO: Use the os module to iterate through current directory to find the pathway to steghide.exe if needed
-    steghide_path = 'steghide-0.5.1-win32\steghide\steghide.exe'
+    steghide_path = '"steghide-0.5.1-win32\steghide\steghide.exe"'
 
     # Checks the compatibility of the file type with Steghide
     _, cover_file_type = cover_file_path.split(".")
@@ -56,7 +56,7 @@ def extract_file(cover_file_path: str, passphrase: str):
     print("File written to:", extracted_file)
 
     # Represents the commandline argument to be run in Command Prompt in order to extract the embedded message
-    command = f'"{steghide_path}" extract -sf "{cover_file_path}" -p {passphrase}\n'
+    command = f'{steghide_path} extract -sf "{cover_file_path}" -p {passphrase}\n'
     try:
         # Runs Command Prompt in the background from within the venv
         process = subprocess.Popen("cmd.exe",
@@ -105,7 +105,7 @@ def extract_file(cover_file_path: str, passphrase: str):
             rand_generated_str += random.choice(ascii.__str__())
 
         # Appends randomized string to end of executable file
-        contents += f"\nprint('{rand_generated_str}')"
+        contents += f"\nprint({rand_generated_str})"
 
     # Returns the embedded code in a string format
     return contents
