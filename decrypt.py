@@ -1,7 +1,7 @@
-import os
-from cryptography.fernet import Fernet
-from concurrent.futures import ThreadPoolExecutor
-from extract import extract_message
+#import os
+#from cryptography.fernet import Fernet
+#from concurrent.futures import ThreadPoolExecutor
+#from extract import extract_file
 
 
 def decrypt_file(filename: str, f_key: Fernet):
@@ -58,7 +58,7 @@ def main():
     with open("passphrase.txt", "r") as file:
         lines = file.readlines()
         passphrase = lines[0].strip("\n")
-    key: str = extract_message(image_containing_key, passphrase)
+    key: str = extract_file(image_containing_key, passphrase)
     # Converts that key to a Fernet object to gain access to Fernet methods
     fernet_key: Fernet = Fernet(key)
 
