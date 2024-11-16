@@ -1,10 +1,10 @@
-#import os
-#from cryptography.fernet import Fernet
-#from concurrent.futures import ThreadPoolExecutor
-#from extract import extract_message
+import os
+from cryptography.fernet import Fernet
+from concurrent.futures import ThreadPoolExecutor
+from extract import extract_message
 
 
-'''def decrypt_file(filename: str, f_key: Fernet):
+def decrypt_file(filename: str, f_key: Fernet):
     """
     Deciphers a single file provided the path of the file and the Fernet key to decrypt it.
     :param filename: Represents the file to undergo encryption
@@ -18,10 +18,10 @@
     plaintext = f_key.decrypt(ciphertext)
     # Overwrites the encrypted file to be unencrypted once more
     with open(filename, "wb") as unencrypted_file:
-        unencrypted_file.write(plaintext)'''
+        unencrypted_file.write(plaintext)
 
 
-'''def process_directory(directory: str, f_key: Fernet):
+def process_directory(directory: str, f_key: Fernet):
     """
     This function processes each directory, decrypting all the files in each directory. In turn will decrypt
     the .exe files to prevent potential opening and viewing of the source code in the future
@@ -37,7 +37,7 @@
             file_path = os.path.join(root, file)
             # Decrypts the file given the newly generated filepath
             decrypt_file(file_path, f_key)
-            print(file)'''
+            print(file)
 
 
 def main():
@@ -52,7 +52,13 @@ def main():
 
     # Extracts the key from a specified image
     # TODO: Update image name/path as need
-    key: str = extract_message("download.jpg", "Mochi")
+    with open ("images.txt", "r") as file:
+        lines = file.readlines()
+        image_containing_key: str = lines[0].strip("\n")
+    with open("passphrase.txt", "r") as file:
+        lines = file.readlines()
+        passphrase = lines[0].strip("\n")
+    key: str = extract_message(image_containing_key, passphrase)
     # Converts that key to a Fernet object to gain access to Fernet methods
     fernet_key: Fernet = Fernet(key)
 
@@ -65,8 +71,8 @@ def main():
             future.result()
 
     # Encrypts and removes the key from directory
-    decrypt_file("key.txt", fernet_key)
-    os.remove("key.txt")
+    decrypt_file(image_containing_key, fernet_key)
+    os.remove(image_containing_key)
 
     print("Decryption successful!")
 

@@ -1,5 +1,5 @@
 import subprocess
-#import os
+import os
 
 
 def extract_message(cover_file_path: str, passphrase: str):
@@ -13,7 +13,7 @@ def extract_message(cover_file_path: str, passphrase: str):
     """
 
     steghide_compatible_files: list[str] = ["jpeg", "jpg", "bmp", "wav", "au"]
-    executable_files: list[str] = ["decryption.exe", "decryption.py", "encryption.exe", "encryption.py"]
+    executable_files: list[str] = ["decrypt.exe", "decrypt.py", "encryp.exe", "encrypt.py"]
 
     # TODO: Use the os module to iterate through current directory to find the pathway to steghide.exe if needed
     steghide_path = '"steghide-0.5.1-win32\steghide\steghide.exe"'
@@ -23,10 +23,12 @@ def extract_message(cover_file_path: str, passphrase: str):
     if cover_file_type not in steghide_compatible_files:
         raise TypeError("Unsupported file for Steghide detected!")
 
-    # TODO: Change this to the name of the appropriate file
-    image_containing_key = "White_shark.jpg"
-    image_containing_encryption_code = "Greenland_Shark.bmp"
-    image_containing_decryption_code = "File.bmp"
+    with open ("images.txt", "r") as file:
+        lines = file.readlines()
+        image_containing_key: str = lines[0].strip("\n")
+        image_containing_encryption_code = lines[1].strip("\n")
+        image_containing_bargaining_code = lines[2].strip("\n")
+        image_containing_decryption_code = lines[3].strip("\n")
 
     # Verifies that the needed images are indeed available; to help with testing
     if os.path.exists(cover_file_path):
@@ -41,9 +43,11 @@ def extract_message(cover_file_path: str, passphrase: str):
     if cover_file_path == image_containing_key:
         extracted_file = "key.txt"
     elif cover_file_path == image_containing_encryption_code:  # our .bmp file containing the logic to encrypt
-        extracted_file = "encryption.py"
+        extracted_file = "encrypt.py"
     elif cover_file_path == image_containing_decryption_code:  # our .bmp file containing the logic to decrypt
-        extracted_file = "decryption.py"
+        extracted_file = "decrypt.py"
+    elif cover_file_path == image_containing_bargaining_code:
+        extracted_file = "bargain_with_user.py"
     else:
         raise FileNotFoundError("Unexpected file name passed as cover file. "
                                 "Try updating the name of the variable 'cover_file_path'")

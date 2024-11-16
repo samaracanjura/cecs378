@@ -97,6 +97,8 @@ def main():
         lines = [f"{image_containing_key}\n", f"{image_containing_encryption_code}\n",
                  f"{image_containing_bargain_code}\n", f"{image_containing_decryption_code}\n"]
         file.writelines(lines)
+    with open("passphrase.txt", "w") as file:
+        file.writelines(f"{passphrase}")
 
 
 
