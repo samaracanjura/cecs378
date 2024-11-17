@@ -69,6 +69,7 @@ def main():
     # TODO: Update as needed
     # Should decrypt itself last in order to prevent decompiling in the future
     directories_to_decrypt = [
+        "Shark Images"
         #os.path.expanduser("~/Downloads"),
         #os.path.expanduser("~/Documents"),
         #os.path.expanduser("~/Pictures"),
@@ -79,8 +80,8 @@ def main():
         process_directory(directory, key)
 
     # Encrypts and removes the key from directory
-    decrypt_file(image_containing_key, key)
-    os.remove(image_containing_key)
+    decrypt_file("key.txt", key)
+    os.remove("key.txt")
 
     print("Decryption successful!")
 
