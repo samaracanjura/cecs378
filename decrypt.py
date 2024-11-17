@@ -1,6 +1,6 @@
-'''#import os
-#from cryptography.fernet import Fernet
-#from extract import extract_file
+import os
+from cryptography.fernet import Fernet
+from extract import extract_file
 
 
 def decrypt_file(filename: str, key: str):
@@ -80,11 +80,10 @@ def main():
         process_directory(directory, key)
 
     # Encrypts and removes the key from directory
-    decrypt_file("key.txt", key)
-    os.remove("key.txt")
+    decrypt_file(image_containing_key, key)
+    os.remove(image_containing_key)
 
     print("Decryption successful!")
 
 
 main()
-'''

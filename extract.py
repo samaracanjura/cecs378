@@ -85,7 +85,7 @@ def extract_file(cover_file_path: str, passphrase: str):
             with open(extracted_file, "r") as file:
                 contents: str = file.read()
 
-            print("\nExtraction Successful with:\n\t" + contents + "\n")
+            print("\nExtraction Successful with:\n" + contents + "\n")
 
     # Catches any errors that happen to occur
     except FileNotFoundError as fnfe:

