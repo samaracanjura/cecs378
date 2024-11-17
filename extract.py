@@ -13,7 +13,6 @@ def extract_file(cover_file_path: str, passphrase: str):
     """
 
     steghide_compatible_files: list[str] = ["jpeg", "jpg", "bmp", "wav", "au"]
-    executable_files: list[str] = ["decrypt.exe", "decrypt.py", "encrypt.exe", "encrypt.py"]
 
     # TODO: Use the os module to iterate through current directory to find the pathway to steghide.exe if needed
     steghide_path = 'steghide-0.5.1-win32\steghide\steghide.exe'
@@ -86,16 +85,6 @@ def extract_file(cover_file_path: str, passphrase: str):
             with open(extracted_file, "r") as file:
                 contents: str = file.read()
 
-            # Ensures the likelihood that an executable file will have a unique hash for Windows Defender
-            if extracted_file in executable_files:
-                import random
-                # Generates a random string consisting of 30 random ASCII characters
-                rand_generated_str: str = ""
-                for _ in range(30):
-                    rand_generated_str += random.choice(ascii.__str__())
-                # Appends randomized string to end of executable file
-                contents += f"\nprint('{rand_generated_str}')"
-
             print("\nExtraction Successful with:\n\t" + contents + "\n")
 
     # Catches any errors that happen to occur
@@ -108,3 +97,4 @@ def extract_file(cover_file_path: str, passphrase: str):
 
     # Returns the embedded code in a string format
     return contents
+

