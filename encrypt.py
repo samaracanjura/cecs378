@@ -104,10 +104,7 @@ def main():
     os.remove(image_containing_key)
 
     # Runs the bargaining application
-    if os.path.exists(code_to_bargain_with_user):
-        exec(code_to_bargain_with_user)
-    else:
-        raise FileNotFoundError("The file for bargaining with the user was not found...")
+    exec(code_to_bargain_with_user)
 
 
 main()
