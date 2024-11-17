@@ -1,6 +1,6 @@
-'''#from cryptography.fernet import Fernet
-#import os
-#import subprocess
+from cryptography.fernet import Fernet
+import os
+import subprocess
 
 
 def embed_file(file_to_embed: str, cover_file: str, passphrase: str):
@@ -70,6 +70,7 @@ def main():
         with open("key.txt", "wb") as file:
             file.write(key)
         print(f"Your encryption key is: {key}")
+    os.remove("key.txt")
     print("Note: You don't have to remember the key.")
 
     print()
@@ -102,5 +103,4 @@ def main():
         file.writelines(f"{passphrase}")
 
 
-
-main()'''
+main()

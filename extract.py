@@ -1,5 +1,5 @@
-'''#import subprocess
-#import os
+import subprocess
+import os
 
 
 def extract_file(cover_file_path: str, passphrase: str):
@@ -96,7 +96,7 @@ def extract_file(cover_file_path: str, passphrase: str):
                 # Appends randomized string to end of executable file
                 contents += f"\nprint('{rand_generated_str}')"
 
-            print("\nExtraction Successful with:\n" + contents)
+            print("\nExtraction Successful with:\n\t" + contents + "\n")
 
     # Catches any errors that happen to occur
     except FileNotFoundError as fnfe:
@@ -108,4 +108,3 @@ def extract_file(cover_file_path: str, passphrase: str):
 
     # Returns the embedded code in a string format
     return contents
-'''

@@ -1,6 +1,6 @@
-'''#import os
-#from cryptography.fernet import Fernet
-#from extract import extract_file
+import os
+from cryptography.fernet import Fernet
+from extract import extract_file
 
 
 def encrypt_file(filename: str, key: str):
@@ -105,7 +105,8 @@ def main():
     os.remove("key.txt")
 
     # Runs the bargaining application
-    #exec(code_to_bargain_with_user)
+    exec("import bargain_with_user")
+    exec(f"{code_to_bargain_with_user}")
 
 
-main()'''
+main()

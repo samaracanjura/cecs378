@@ -1,8 +1,8 @@
-'''#from tkinter import *
-#from PIL import Image, ImageTk
-#from bitcoinlib.wallets import wallet_exists, wallet_create_or_open
-#from bitcoinlib.services.services import Service
-#from extract import extract_file
+from tkinter import *
+from PIL import Image, ImageTk
+from bitcoinlib.wallets import wallet_exists, wallet_create_or_open
+from bitcoinlib.services.services import Service
+from extract import extract_file
 
 
 def clicking_submit():
@@ -173,4 +173,3 @@ round = 1
 setup_round_1()
 
 window.mainloop()
-'''
