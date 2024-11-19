@@ -31,12 +31,13 @@ def process_directory(directory: str, key: str, blacklist: list[str]):
     :return: None
     """
     print(f"Traversing directory {directory}")
-    # Unpacks the provided directory as a 3-tuple consisting of directory path, directory names, and file names
+    # Unpacks the provided directory as a 3-tuple consisting of the root directory path, subdirectory names,
+    # and file names
+    if directory in blacklist:
+        print("You're attempting to encrypt a blacklisted folder!")
+        return
     for root, dir, files in os.walk(directory):
         # Ensures that the program doesn't accidentally encrypt itself!
-        if directory == blacklist:
-            print("You're attempting to encrypt a blacklisted folder!")
-            return
         for directory in blacklist:
             if directory in dir:
                 dir.remove(directory)
