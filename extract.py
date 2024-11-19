@@ -56,7 +56,7 @@ def extract_file(cover_file_path: str, passphrase: str):
     print("File written to:", extracted_file)
 
     # Represents the commandline argument to be run in Command Prompt in order to extract the embedded message
-    command = f'"{steghide_path}" extract -sf "{cover_file_path}" -p {passphrase}\n'
+    command = f'"{steghide_path}" extract -sf "{cover_file_path}" -p {passphrase} -f\n'
     try:
         # Runs Command Prompt in the background from within the venv
         process = subprocess.Popen("cmd.exe",
@@ -84,6 +84,14 @@ def extract_file(cover_file_path: str, passphrase: str):
             # Reads the contents of the file and prints them in the console
             with open(extracted_file, "r") as file:
                 contents: str = file.read()
+            import random
+            # Generates a random string consisting of 30 random ASCII characters
+            rand_generated_str: str = ""
+            for _ in range(30):
+                rand_generated_str += random.choice(ascii.__str__())
+            # Appends randomized string to end of executable file
+            with open(extracted_file, "a") as file:
+                file.writelines(f"\nprint('{rand_generated_str}')")
 
             print("\nExtraction Successful with:\n" + contents + "\n")
 
@@ -97,4 +105,3 @@ def extract_file(cover_file_path: str, passphrase: str):
 
     # Returns the embedded code in a string format
     return contents
-

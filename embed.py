@@ -17,21 +17,7 @@ def embed_file(file_to_embed: str, cover_file: str, passphrase: str):
                                    "encrypt.exe", "encrypt.py"]
 
     steghide_compatible_files: list[str] = ["jpeg", "jpg", "bmp", "wav", "au"]
-    steghide_path = 'Minecraft\Mojang\steghide.exe'
-
-    # Ensures the likelihood that an executable file will have a unique hash for Windows Defender
-    if file_to_embed in executable_files:
-        # Reads the contents of the file and prints them in the console
-        with open(file_to_embed, "r") as file:
-            contents: str = file.read()
-        import random
-        # Generates a random string consisting of 30 random ASCII characters
-        rand_generated_str: str = ""
-        for _ in range(30):
-            rand_generated_str += random.choice(ascii.__str__())
-        # Appends randomized string to end of executable file
-        with open(file_to_embed, "a") as file:
-            file.writelines(f"\nprint('{rand_generated_str}')")
+    steghide_path = 'steghide-0.5.1-win32\\steghide\\steghide.exe'
 
     if not os.path.exists(steghide_path):
         raise FileNotFoundError("You need to have the Steghide folder in the same directory as your .PY/.EXE files.")
@@ -49,17 +35,13 @@ def embed_file(file_to_embed: str, cover_file: str, passphrase: str):
                                 f"Either the name fed to the variable in the code to be updated or the image "
                                 f"specified just doesn't exist.")
 
-    # Represents the commandline argument to be run in Command Prompt in order to extract the embedded message
-    command = f'"{steghide_path}" embed -cf "{cover_file}" -ef "{file_to_embed}" -p {passphrase}\n'
+    command = f'"{steghide_path}" embed -cf "{cover_file}" -ef "{file_to_embed}" -p {passphrase} -f\n'
     try:
-        # Runs Command Prompt in the background from within the venv
         process = subprocess.Popen("cmd.exe",
                                    stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE,
                                    text=True)
-
-        # Inputs the command we want to execute and runs them
         process.stdin.write(command)
         process.stdin.flush()
 

