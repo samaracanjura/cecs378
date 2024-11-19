@@ -1,9 +1,10 @@
-import os
-from cryptography.fernet import Fernet
-from extract import extract_file
+#import os
+#import cryptography.fernet
+#from cryptography.fernet import Fernet
+#from extract import extract_file
 
 
-def decrypt_file(filename: str, key: str):
+'''def decrypt_file(filename: str, key: str):
     """
     Deciphers a single file provided the path of the file and the Fernet key to decrypt it.
     :param filename: Represents the file to undergo encryption
@@ -15,11 +16,15 @@ def decrypt_file(filename: str, key: str):
     # Assigns the data inside the encrypted file to a variable
     with open(filename, "rb") as encrypted_file:
         ciphertext = encrypted_file.read()
-    # Decrypts the encrypted data using the key and assigns the unencrypted data to a variable
-    plaintext = f_key.decrypt(ciphertext)
-    # Overwrites the encrypted file to be unencrypted once more
-    with open(filename, "wb") as unencrypted_file:
-        unencrypted_file.write(plaintext)
+    try:
+        # Decrypts the encrypted data using the key and assigns the unencrypted data to a variable
+        plaintext = f_key.decrypt(ciphertext)
+        # Overwrites the encrypted file to be unencrypted once more
+        with open(filename, "wb") as unencrypted_file:
+            unencrypted_file.write(plaintext)
+            print(f'The file "{filename}" was successfully decrypted!')
+    except cryptography.fernet.InvalidToken:
+        print(f'The file "{filename}" is already unencrypted')'''
 
 
 def process_directory(directory: str, key: str):
@@ -30,6 +35,7 @@ def process_directory(directory: str, key: str):
     :param key: Represents an instance of the Fernet Class created with a key.
     :return: None
     """
+    print(f'Traversing the directory "{directory}"')
     # Unpacks the provided directory as a 3-tuple consisting of directory path, directory names, and file names
     for root, _, files in os.walk(directory):
         # Iterates through each file in the directory
@@ -38,7 +44,6 @@ def process_directory(directory: str, key: str):
             file_path = os.path.join(root, file)
             # Decrypts the file given the newly generated filepath
             decrypt_file(file_path, key)
-            print(file)
 
 
 def main():
@@ -79,7 +84,7 @@ def main():
     for directory in directories_to_decrypt:
         process_directory(directory, key)
 
-    print("Decryption successful!")
+    print("\nDecryption successful!")
 
 
 main()
