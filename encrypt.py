@@ -91,7 +91,7 @@ def main():
 
     # Represents folders to avoid encrypting for safety of host computer whilst maintaining functionality
     # of the ransomware.
-    blacklist: list[str] = ["New folder"]
+    blacklist: list[str] = [os.getcwd()]
 
     # Directories to encrypt in their entirety
     # TODO: Update as needed for testing purposes
