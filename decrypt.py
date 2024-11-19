@@ -7,7 +7,7 @@ def decrypt_file(filename: str, key: str):
     """
     Deciphers a single file provided the path of the file and the Fernet key to decrypt it.
     :param filename: Represents the file to undergo encryption
-    :param key:
+    :param key: Represents an instance of the Fernet Class created with a key.
     :return: None
     """
     # Converts that key to a Fernet object to gain access to Fernet methods
@@ -78,10 +78,6 @@ def main():
 
     for directory in directories_to_decrypt:
         process_directory(directory, key)
-
-    # Encrypts and removes the key from directory
-    decrypt_file(image_containing_key, key)
-    os.remove(image_containing_key)
 
     print("Decryption successful!")
 

