@@ -1,7 +1,6 @@
-'''from tkinter import *
-import bitcoinlib.transactions
+from tkinter import *
 from PIL import Image, ImageTk
-from bitcoinlib.wallets import wallet_exists, wallet_create_or_open
+from bitcoinlib.wallets import wallet_exists, wallet_create_or_open, wallet_delete
 from bitcoinlib.services.services import Service
 from extract import extract_file
 from bitcoinlib.mnemonic import Mnemonic
@@ -22,6 +21,7 @@ def clicking_submit():
                                            network="testnet")
             print(f"Wallet Name: {wallet_name}")
             print(f"Wallet Address: {wallet.get_key().address}")
+            wallet.utxos_update()
             round += 1
             for widget in window.winfo_children():
                 if widget != image_label:
@@ -119,8 +119,8 @@ def setup_round_2():
 
 def setup_round_3():
     # TODO: Input a wallet to send to...
-    receiver_address: str = "tb1q8fwk4r7tvt5zm6xc40ucd5mljesdj2jyt5hpea"
-    # Updates Unspent Outputs to limit the occurrence of an error occurring
+    receiver_address: str = "tb1qdv4lg0n06tqxf7fh3ptlh7cx6azw5f5rddupls"
+    # Updates unspent outputs to limit the occurrence of an error occurring
     wallet.utxos_update()
     try:
         # Attempts to create and send transaction to testnet network
@@ -159,7 +159,6 @@ def decryption(transaction_details):
     with open("passphrase.txt", "r") as file:
         lines = file.readlines()
         passphrase = lines[0].strip("\n")
-
     with open("images.txt", "r") as file:
         lines = file.readlines()
         image_containing_decryption_code: str = lines[3].strip("\n")
@@ -167,10 +166,13 @@ def decryption(transaction_details):
     try:
         decryption_code_found: bool = os.path.exists(image_containing_decryption_code)
         if decryption_code_found:
-            code_to_decrypt_files: str = extract_file(image_containing_decryption_code, passphrase)
-            exec("import decrypt")
-            exec(f"{code_to_decrypt_files}")
-            print(f"\nTransaction Details: {transaction_details}")
+            print(transaction_details.outputs)
+            print(transaction_details.info)
+            pass
+            #code_to_decrypt_files: str = extract_file(image_containing_decryption_code, passphrase)
+            #exec("import decrypt")
+            #exec(f"{code_to_decrypt_files}")
+            #print(f"\nTransaction Details: {transaction_details}")
         else:
             raise FileNotFoundError(
                 f"The image name/path {image_containing_decryption_code} doesn't exist in the current directory."
@@ -199,4 +201,3 @@ round = 1
 setup_round_1()
 
 window.mainloop()
-'''
