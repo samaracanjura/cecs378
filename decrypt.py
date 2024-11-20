@@ -1,10 +1,10 @@
-#import os
-#import cryptography.fernet
-#from cryptography.fernet import Fernet
-#from extract import extract_file
+import os
+import cryptography.fernet
+from cryptography.fernet import Fernet
+from extract import extract_file
 
 
-'''def decrypt_file(filename: str, key: str):
+def decrypt_file(filename: str, key: str):
     """
     Deciphers a single file provided the path of the file and the Fernet key to decrypt it.
     :param filename: Represents the file to undergo encryption
@@ -24,7 +24,7 @@
             unencrypted_file.write(plaintext)
             print(f'The file "{filename}" was successfully decrypted!')
     except cryptography.fernet.InvalidToken:
-        print(f'The file "{filename}" is already unencrypted')'''
+        print(f'The file "{filename}" is already unencrypted')
 
 
 def process_directory(directory: str, key: str):
@@ -74,11 +74,7 @@ def main():
     # TODO: Update as needed
     # Should decrypt itself last in order to prevent decompiling in the future
     directories_to_decrypt = [
-        "Shark Images"
-        #os.path.expanduser("~/Downloads"),
-        #os.path.expanduser("~/Documents"),
-        #os.path.expanduser("~/Pictures"),
-        #os.getcwd()
+        "Dummy Folder to Encrypt"
     ]
 
     for directory in directories_to_decrypt:

